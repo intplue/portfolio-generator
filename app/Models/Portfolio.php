@@ -23,5 +23,7 @@ class Portfolio extends Model
         'social_links',
         'additional_info',
         'template',
+        'accent_color',
+        'layout_style',
     ];
 }
