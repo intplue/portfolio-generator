@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Modern Portfolio</title>
+    <title>{{ $portfolio->full_name }} — Modern Portfolio</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,41 @@
         rel="stylesheet"
     >
 
+    @php
+        $accent = match ($portfolio->accent_color) {
+            'green' => '#18382a',
+            'plum' => '#6b3f68',
+            default => '#172033',
+        };
+
+        $accentLight = match ($portfolio->accent_color) {
+            'green' => '#dce5d8',
+            'plum' => '#eadde8',
+            default => '#dce5ed',
+        };
+
+        $accentMuted = match ($portfolio->accent_color) {
+            'green' => '#526b5d',
+            'plum' => '#80657d',
+            default => '#3d6fa8',
+        };
+
+        $layout = $portfolio->layout_style ?? 'standard';
+    @endphp
+
     <style>
+
+        :root {
+            --accent: {{ $accent }};
+            --accent-light: {{ $accentLight }};
+            --accent-muted: {{ $accentMuted }};
+            --background: #eef1f3;
+            --paper: #ffffff;
+            --text: #20252d;
+            --body-text: #4f5863;
+            --muted: #727b85;
+            --border: #dce2e7;
+        }
 
         * {
             margin: 0;
@@ -24,36 +58,40 @@
 
         body {
             font-family: 'Raleway', sans-serif;
-            background: #eef1f3;
-            color: #172033;
-            line-height: 1.6;
+            background: var(--background);
+            color: var(--text);
         }
 
         .portfolio {
             width: 92%;
-            max-width: 1200px;
-            margin: 40px auto;
+            max-width: 1150px;
+            margin: 45px auto;
+            background: var(--paper);
+            min-height: 100vh;
+            padding: 55px;
         }
 
-        /* PROFILE */
+        /* HEADER */
 
-        .profile-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 45px;
+        .profile {
             display: grid;
-            grid-template-columns: 140px 1fr auto;
-            gap: 35px;
+            grid-template-columns: 1fr 180px;
+            gap: 50px;
             align-items: center;
-            margin-bottom: 25px;
+            background: var(--accent);
+            color: #ffffff;
+            padding: 55px;
+            border-radius: 12px;
+            margin-bottom: 35px;
         }
 
         .profile-picture {
-            width: 140px;
-            height: 140px;
-            background: #dce5ed;
-            border-radius: 14px;
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            background: var(--accent-light);
             overflow: hidden;
+            order: 2;
         }
 
         .profile-picture img {
@@ -62,299 +100,113 @@
             object-fit: cover;
         }
 
+        .profile-content {
+            order: 1;
+        }
+
         .profile-label {
             font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 2px;
-            color: #3d6fa8;
-            margin-bottom: 10px;
+            opacity: 0.75;
+            margin-bottom: 12px;
         }
 
         .profile-name {
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-size: clamp(2.3rem, 5vw, 4.5rem);
             line-height: 1;
-            font-weight: 700;
-            color: #172033;
-            margin-bottom: 12px;
+            font-weight: 800;
+            margin-bottom: 18px;
         }
 
         .profile-title {
             font-size: 0.95rem;
-            font-weight: 500;
-            color: #647080;
+            line-height: 1.7;
+            opacity: 0.8;
+            margin-bottom: 25px;
         }
 
         .contact {
             display: flex;
-            flex-direction: column;
-            gap: 9px;
-            text-align: right;
+            flex-wrap: wrap;
+            gap: 10px 20px;
             font-size: 0.78rem;
-            color: #647080;
+            opacity: 0.85;
         }
 
-        /* INTRO */
+        /* SECTIONS */
 
-        .intro-grid {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .about-card,
-        .quick-card {
-            background: #ffffff;
-            border-radius: 16px;
+        .section {
+            margin-bottom: 35px;
             padding: 35px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
         }
 
-        .card-label {
+        .section-label {
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 2px;
-            color: #3d6fa8;
-            margin-bottom: 15px;
+            color: var(--accent-muted);
+            margin-bottom: 18px;
         }
 
-        .about-text {
-            font-size: 1rem;
+        .about-text,
+        .content-text,
+        .experience-content,
+        .project-content {
+            font-size: 0.92rem;
             line-height: 1.9;
-            color: #4f5a68;
+            color: var(--body-text);
+            white-space: pre-line;
         }
 
-        .quick-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        /* GRID */
 
-        .quick-item {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #e2e6ea;
-            font-size: 0.82rem;
-        }
-
-        .quick-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .quick-label {
-            color: #7a8491;
-        }
-
-        .quick-value {
-            font-weight: 600;
-            color: #172033;
-            text-align: right;
-        }
-
-        /* EDUCATION + SKILLS */
-
-        .info-grid {
+        .two-column {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 25px;
-            margin-bottom: 25px;
+            margin-bottom: 35px;
         }
 
-        .info-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 35px;
+        .two-column .section {
+            margin-bottom: 0;
         }
 
-        .education-item {
-            padding: 20px 0;
-            border-bottom: 1px solid #e2e6ea;
-        }
+        /* SKILLS */
 
-        .education-item:first-of-type {
-            padding-top: 5px;
-        }
-
-        .education-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .education-year {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #3d6fa8;
-            margin-bottom: 6px;
-        }
-
-        .education-school {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #172033;
-            margin-bottom: 4px;
-        }
-
-        .education-degree {
-            font-size: 0.8rem;
-            color: #687382;
-        }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .skill {
-            background: #dce5ed;
-            color: #172033;
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            font-weight: 600;
-        }
-
-        /* EXPERIENCE */
-
-        .experience-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 35px;
-            margin-bottom: 25px;
-        }
-
-        .experience-item {
-            display: grid;
-            grid-template-columns: 180px 1fr;
-            gap: 35px;
-            padding: 25px 0;
-            border-bottom: 1px solid #e2e6ea;
-        }
-
-        .experience-item:first-of-type {
-            padding-top: 5px;
-        }
-
-        .experience-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .experience-date {
-            font-size: 0.7rem;
+            padding: 9px 15px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 7px;
+            font-size: 0.8rem;
             font-weight: 700;
-            letter-spacing: 1px;
-            color: #3d6fa8;
-        }
-
-        .experience-position {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #172033;
-            margin-bottom: 4px;
-        }
-
-        .experience-company {
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: #687382;
-            margin-bottom: 10px;
-        }
-
-        .experience-description {
-            font-size: 0.85rem;
-            line-height: 1.8;
-            color: #4f5a68;
-            max-width: 700px;
         }
 
         /* PROJECTS */
 
-        .projects-card {
-            background: #ffffff;
-            border-radius: 16px;
+        .project-content {
+            padding: 20px;
+            border-left: 4px solid var(--accent-muted);
+            background: #f7f8f9;
+        }
+
+        /* SOCIAL */
+
+        .social-section {
+            margin-top: 35px;
             padding: 35px;
-            margin-bottom: 25px;
-        }
-
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-        }
-
-        .project {
-            border: 1px solid #dce1e6;
+            background: var(--accent-light);
             border-radius: 12px;
-            padding: 25px;
-            transition: 0.2s ease;
-        }
-
-        .project:hover {
-            border-color: #3d6fa8;
-        }
-
-        .project-number {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #3d6fa8;
-            margin-bottom: 10px;
-        }
-
-        .project-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #172033;
-            margin-bottom: 8px;
-        }
-
-        .project-description {
-            font-size: 0.82rem;
-            line-height: 1.7;
-            color: #687382;
-            margin-bottom: 15px;
-        }
-
-        .project-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .project-tech {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #3d6fa8;
-        }
-
-        .project-link {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: #172033;
-            text-decoration: none;
-        }
-
-        .project-link:hover {
-            color: #3d6fa8;
-        }
-
-        /* SOCIAL LINKS */
-
-        .social-card {
-            background: #172033;
-            border-radius: 16px;
-            padding: 35px;
-            color: #ffffff;
-            margin-bottom: 25px;
-        }
-
-        .social-card .card-label {
-            color: #8eb4dc;
         }
 
         .social-links {
@@ -364,110 +216,132 @@
         }
 
         .social-link {
-            color: #ffffff;
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 700;
             text-decoration: none;
-            border: 1px solid #4a5669;
-            border-radius: 8px;
-            padding: 10px 18px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            padding: 10px 16px;
+            background: #ffffff;
+            border-radius: 7px;
         }
 
         .social-link:hover {
-            background: #3d6fa8;
-            border-color: #3d6fa8;
+            background: var(--accent);
+            color: #ffffff;
         }
 
         /* FOOTER */
 
         .footer {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 25px 35px;
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            align-items: center;
             gap: 20px;
             font-size: 0.72rem;
-            color: #7a8491;
+            color: var(--muted);
         }
 
         .footer-name {
-            color: #172033;
+            color: var(--accent);
             font-weight: 700;
+        }
+
+        /* STANDARD */
+
+        .layout-standard .section {
+            box-shadow: 0 5px 20px rgba(20, 30, 40, 0.04);
+        }
+
+        /* CARDS */
+
+        .layout-cards .section {
+            box-shadow: 0 10px 30px rgba(20, 30, 40, 0.08);
+            border: none;
+        }
+
+        .layout-cards .profile {
+            box-shadow: 0 12px 35px rgba(20, 30, 40, 0.15);
+        }
+
+        .layout-cards .social-section {
+            box-shadow: 0 10px 30px rgba(20, 30, 40, 0.08);
+        }
+
+        /* EDITORIAL */
+
+        .layout-editorial {
+            max-width: 1050px;
+        }
+
+        .layout-editorial .profile {
+            grid-template-columns: 180px 1fr;
+        }
+
+        .layout-editorial .profile-picture {
+            order: 1;
+        }
+
+        .layout-editorial .profile-content {
+            order: 2;
+        }
+
+        .layout-editorial .two-column {
+            grid-template-columns: 1.2fr 0.8fr;
+        }
+
+        .layout-editorial .section {
+            border-radius: 0;
+            border-left: 5px solid var(--accent);
         }
 
         /* RESPONSIVE */
 
-        @media (max-width: 850px) {
-
-            .profile-card {
-                grid-template-columns: 120px 1fr;
-            }
-
-            .contact {
-                grid-column: 1 / -1;
-                flex-direction: row;
-                flex-wrap: wrap;
-                text-align: left;
-                gap: 10px 25px;
-                padding-top: 15px;
-                border-top: 1px solid #e2e6ea;
-            }
-
-            .intro-grid,
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-
-        }
-
-        @media (max-width: 600px) {
+        @media (max-width: 750px) {
 
             .portfolio {
                 width: 94%;
-                margin: 20px auto;
+                margin: 25px auto;
+                padding: 25px;
             }
 
-            .profile-card {
+            .profile,
+            .layout-editorial .profile {
                 grid-template-columns: 1fr;
                 text-align: center;
                 justify-items: center;
-                padding: 30px 25px;
+                padding: 35px 25px;
+            }
+
+            .profile-picture,
+            .layout-editorial .profile-picture {
+                order: 1;
+                width: 150px;
+                height: 150px;
+            }
+
+            .profile-content,
+            .layout-editorial .profile-content {
+                order: 2;
             }
 
             .contact {
                 justify-content: center;
-                text-align: center;
             }
 
-            .about-card,
-            .quick-card,
-            .info-card,
-            .experience-card,
-            .projects-card,
-            .social-card {
-                padding: 25px;
-            }
-
-            .skills-grid {
+            .two-column,
+            .layout-editorial .two-column {
                 grid-template-columns: 1fr;
             }
 
-            .experience-item {
-                grid-template-columns: 1fr;
-                gap: 8px;
+            .section {
+                padding: 28px;
             }
 
             .footer {
                 flex-direction: column;
-                align-items: flex-start;
             }
-
         }
 
     </style>
@@ -475,13 +349,22 @@
 
 <body>
 
-    <main class="portfolio">
+    <main class="portfolio layout-{{ $layout }}">
 
         <!-- PROFILE -->
 
-        <section class="profile-card">
+        <section class="profile">
 
-            <div class="profile-picture"></div>
+            <div class="profile-picture">
+
+                @if ($portfolio->profile_picture)
+                    <img
+                        src="{{ asset('storage/' . $portfolio->profile_picture) }}"
+                        alt="{{ $portfolio->full_name }}"
+                    >
+                @endif
+
+            </div>
 
             <div class="profile-content">
 
@@ -490,430 +373,218 @@
                 </div>
 
                 <h1 class="profile-name">
-                    Your Name
+                    {{ $portfolio->full_name }}
                 </h1>
 
                 <p class="profile-title">
-                    Student • Developer • Designer
+                    {{ $portfolio->additional_info ?? 'Student • Developer • Designer' }}
                 </p>
 
-            </div>
+                <div class="contact">
 
-            <div class="contact">
+                    @if ($portfolio->email)
+                        <span>{{ $portfolio->email }}</span>
+                    @endif
 
-                <span>
-                    email@example.com
-                </span>
+                    @if ($portfolio->contact_number)
+                        <span>{{ $portfolio->contact_number }}</span>
+                    @endif
 
-                <span>
-                    +63 900 000 0000
-                </span>
+                    @if ($portfolio->address)
+                        <span>{{ $portfolio->address }}</span>
+                    @endif
 
-                <span>
-                    Your City, Philippines
-                </span>
+                </div>
 
             </div>
 
         </section>
 
 
-        <!-- ABOUT + QUICK INFORMATION -->
+        <!-- ABOUT -->
 
-        <section class="intro-grid">
+        @if ($portfolio->about_me)
 
-            <div class="about-card">
+            <section class="section">
 
-                <div class="card-label">
+                <div class="section-label">
                     ABOUT ME
                 </div>
 
                 <p class="about-text">
-                    I am a passionate student and aspiring professional
-                    who enjoys learning new skills, working on meaningful
-                    projects, and continuously improving my craft. I am
-                    interested in creating practical and thoughtful
-                    solutions through technology and creativity.
+                    {{ $portfolio->about_me }}
                 </p>
 
-            </div>
+            </section>
 
-
-            <div class="quick-card">
-
-                <div class="card-label">
-                    QUICK INFO
-                </div>
-
-                <div class="quick-list">
-
-                    <div class="quick-item">
-
-                        <span class="quick-label">
-                            Location
-                        </span>
-
-                        <span class="quick-value">
-                            Your City
-                        </span>
-
-                    </div>
-
-                    <div class="quick-item">
-
-                        <span class="quick-label">
-                            Field
-                        </span>
-
-                        <span class="quick-value">
-                            Information Technology
-                        </span>
-
-                    </div>
-
-                    <div class="quick-item">
-
-                        <span class="quick-label">
-                            Availability
-                        </span>
-
-                        <span class="quick-value">
-                            Open to opportunities
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
+        @endif
 
 
         <!-- EDUCATION + SKILLS -->
 
-        <section class="info-grid">
+        <div class="two-column">
 
-            <div class="info-card">
+            @if ($portfolio->educational_background)
 
-                <div class="card-label">
-                    EDUCATION
-                </div>
+                <section class="section">
 
-
-                <div class="education-item">
-
-                    <div class="education-year">
-                        2024 — PRESENT
+                    <div class="section-label">
+                        EDUCATION
                     </div>
 
-                    <div class="education-school">
-                        University Name
+                    <div class="content-text">
+                        {{ $portfolio->educational_background }}
                     </div>
 
-                    <div class="education-degree">
-                        Bachelor of Science in Information Technology
+                </section>
+
+            @endif
+
+
+            @if ($portfolio->skills)
+
+                <section class="section">
+
+                    <div class="section-label">
+                        SKILLS
                     </div>
 
-                </div>
+                    <div class="skills-list">
 
+                        @foreach (preg_split('/[,;\n]+/', $portfolio->skills) as $skill)
 
-                <div class="education-item">
+                            @if (trim($skill))
+                                <span class="skill">
+                                    {{ trim($skill) }}
+                                </span>
+                            @endif
 
-                    <div class="education-year">
-                        2022 — 2024
+                        @endforeach
+
                     </div>
 
-                    <div class="education-school">
-                        Senior High School
-                    </div>
+                </section>
 
-                    <div class="education-degree">
-                        Accountancy, Business and Management
-                    </div>
+            @endif
 
-                </div>
-
-            </div>
-
-
-            <div class="info-card">
-
-                <div class="card-label">
-                    SKILLS
-                </div>
-
-                <div class="skills-grid">
-
-                    <div class="skill">
-                        Java
-                    </div>
-
-                    <div class="skill">
-                        PHP
-                    </div>
-
-                    <div class="skill">
-                        Laravel
-                    </div>
-
-                    <div class="skill">
-                        MySQL
-                    </div>
-
-                    <div class="skill">
-                        HTML
-                    </div>
-
-                    <div class="skill">
-                        CSS
-                    </div>
-
-                    <div class="skill">
-                        Git
-                    </div>
-
-                    <div class="skill">
-                        UI Design
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
+        </div>
 
 
         <!-- WORK EXPERIENCE -->
 
-        <section class="experience-card">
+        @if ($portfolio->work_experience)
 
-            <div class="card-label">
-                WORK EXPERIENCE
-            </div>
+            <section class="section">
 
-
-            <div class="experience-item">
-
-                <div class="experience-date">
-                    2025 — PRESENT
+                <div class="section-label">
+                    WORK EXPERIENCE
                 </div>
 
-                <div>
-
-                    <div class="experience-position">
-                        Position Title
-                    </div>
-
-                    <div class="experience-company">
-                        Company or Organization
-                    </div>
-
-                    <p class="experience-description">
-                        Describe your responsibilities, contributions,
-                        and the experience you gained in this role.
-                        Keep the description concise and focused on
-                        meaningful work.
-                    </p>
-
+                <div class="experience-content">
+                    {{ $portfolio->work_experience }}
                 </div>
 
-            </div>
+            </section>
 
-
-            <div class="experience-item">
-
-                <div class="experience-date">
-                    2024 — 2025
-                </div>
-
-                <div>
-
-                    <div class="experience-position">
-                        Intern / Assistant
-                    </div>
-
-                    <div class="experience-company">
-                        Company or Organization
-                    </div>
-
-                    <p class="experience-description">
-                        Add a short description of your responsibilities,
-                        tasks, projects, or achievements during this
-                        experience.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
+        @endif
 
 
         <!-- PROJECTS -->
 
-        <section class="projects-card">
+        @if ($portfolio->projects)
 
-            <div class="card-label">
-                PROJECTS
-            </div>
+            <section class="section">
 
+                <div class="section-label">
+                    PROJECTS
+                </div>
 
-            <div class="projects-grid">
+                <div class="project-content">
+                    {{ $portfolio->projects }}
+                </div>
 
-                <article class="project">
+            </section>
 
-                    <div class="project-number">
-                        PROJECT 01
-                    </div>
-
-                    <div class="project-title">
-                        Project Name
-                    </div>
-
-                    <p class="project-description">
-                        A short description of the project, its purpose,
-                        and your contribution to the project.
-                    </p>
-
-                    <div class="project-bottom">
-
-                        <span class="project-tech">
-                            Laravel • MySQL
-                        </span>
-
-                        <a href="#" class="project-link">
-                            View Project →
-                        </a>
-
-                    </div>
-
-                </article>
+        @endif
 
 
-                <article class="project">
+        <!-- ADDITIONAL INFORMATION -->
 
-                    <div class="project-number">
-                        PROJECT 02
-                    </div>
+        @if ($portfolio->additional_info)
 
-                    <div class="project-title">
-                        Another Project
-                    </div>
+            <section class="section">
 
-                    <p class="project-description">
-                        Add another project that demonstrates your skills,
-                        creativity, or knowledge in your field.
-                    </p>
+                <div class="section-label">
+                    ADDITIONAL INFORMATION
+                </div>
 
-                    <div class="project-bottom">
+                <div class="content-text">
+                    {{ $portfolio->additional_info }}
+                </div>
 
-                        <span class="project-tech">
-                            Java • MySQL
-                        </span>
+            </section>
 
-                        <a href="#" class="project-link">
-                            View Project →
-                        </a>
-
-                    </div>
-
-                </article>
-
-
-                <article class="project">
-
-                    <div class="project-number">
-                        PROJECT 03
-                    </div>
-
-                    <div class="project-title">
-                        Third Project
-                    </div>
-
-                    <p class="project-description">
-                        Include another relevant school, personal,
-                        academic, or professional project.
-                    </p>
-
-                    <div class="project-bottom">
-
-                        <span class="project-tech">
-                            PHP • HTML • CSS
-                        </span>
-
-                        <a href="#" class="project-link">
-                            View Project →
-                        </a>
-
-                    </div>
-
-                </article>
-
-
-                <article class="project">
-
-                    <div class="project-number">
-                        PROJECT 04
-                    </div>
-
-                    <div class="project-title">
-                        Fourth Project
-                    </div>
-
-                    <p class="project-description">
-                        Showcase another project that represents your
-                        experience, interests, or technical abilities.
-                    </p>
-
-                    <div class="project-bottom">
-
-                        <span class="project-tech">
-                            Web Development
-                        </span>
-
-                        <a href="#" class="project-link">
-                            View Project →
-                        </a>
-
-                    </div>
-
-                </article>
-
-            </div>
-
-        </section>
+        @endif
 
 
         <!-- SOCIAL LINKS -->
 
-        <section class="social-card">
+        @if (
+            $portfolio->website ||
+            $portfolio->linkedin ||
+            $portfolio->github ||
+            $portfolio->social_links
+        )
 
-            <div class="card-label">
-                FIND ME ONLINE
-            </div>
+            <section class="social-section">
 
-            <div class="social-links">
+                <div class="section-label">
+                    FIND ME ONLINE
+                </div>
 
-                <a href="#" class="social-link">
-                    LinkedIn
-                </a>
+                <div class="social-links">
 
-                <a href="#" class="social-link">
-                    GitHub
-                </a>
+                    @if ($portfolio->website)
+                        <a
+                            href="{{ $portfolio->website }}"
+                            class="social-link"
+                            target="_blank"
+                        >
+                            Website
+                        </a>
+                    @endif
 
-                <a href="#" class="social-link">
-                    Personal Website
-                </a>
+                    @if ($portfolio->linkedin)
+                        <a
+                            href="{{ $portfolio->linkedin }}"
+                            class="social-link"
+                            target="_blank"
+                        >
+                            LinkedIn
+                        </a>
+                    @endif
 
-                <a href="#" class="social-link">
-                    Other Social Link
-                </a>
+                    @if ($portfolio->github)
+                        <a
+                            href="{{ $portfolio->github }}"
+                            class="social-link"
+                            target="_blank"
+                        >
+                            GitHub
+                        </a>
+                    @endif
 
-            </div>
+                    @if ($portfolio->social_links)
+                        <span class="social-link">
+                            {{ $portfolio->social_links }}
+                        </span>
+                    @endif
 
-        </section>
+                </div>
+
+            </section>
+
+        @endif
 
 
         <!-- FOOTER -->
@@ -921,11 +592,11 @@
         <footer class="footer">
 
             <span class="footer-name">
-                Your Name
+                {{ $portfolio->full_name }}
             </span>
 
             <span>
-                © 2026 • Portfolio
+                © {{ date('Y') }} • Portfolio
             </span>
 
         </footer>

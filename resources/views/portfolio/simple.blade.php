@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Simple Portfolio</title>
+    <title>{{ $portfolio->full_name }} — Portfolio</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,42 @@
         rel="stylesheet"
     >
 
+    @php
+        $accent = match ($portfolio->accent_color) {
+            'blue' => '#3d6fa8',
+            'plum' => '#6b3f68',
+            default => '#18382a',
+        };
+
+        $accentLight = match ($portfolio->accent_color) {
+            'blue' => '#dce5ed',
+            'plum' => '#eadde8',
+            default => '#d8ddd3',
+        };
+
+        $accentMuted = match ($portfolio->accent_color) {
+            'blue' => '#627d9b',
+            'plum' => '#80657d',
+            default => '#526b5d',
+        };
+
+        $layout = $portfolio->layout_style ?? 'standard';
+    @endphp
+
     <style>
+
+        :root {
+            --accent: {{ $accent }};
+            --accent-muted: {{ $accentMuted }};
+            --accent-light: {{ $accentLight }};
+            --background: #f3efe3;
+            --paper: #faf8f2;
+            --text: #202722;
+            --body-text: #3f4942;
+            --muted: #626b64;
+            --border: #d9d6ca;
+            --soft-border: #e0ddd2;
+        }
 
         * {
             margin: 0;
@@ -24,15 +59,15 @@
 
         body {
             font-family: 'Raleway', sans-serif;
-            background: #f3efe3;
-            color: #18382a;
+            background: var(--background);
+            color: var(--text);
         }
 
         .portfolio {
             width: 90%;
             max-width: 1100px;
             margin: 60px auto;
-            background: #faf8f2;
+            background: var(--paper);
             min-height: 100vh;
             padding: 70px;
         }
@@ -45,21 +80,31 @@
             gap: 45px;
             align-items: center;
             padding-bottom: 55px;
-            border-bottom: 1px solid #d9d6ca;
+            border-bottom: 1px solid var(--border);
         }
 
         .profile-picture {
             width: 180px;
             height: 180px;
-            background: #d8ddd3;
+            background: var(--accent-light);
             border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .profile-label {
             font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 2px;
-            color: #526b5d;
+            color: var(--accent-muted);
             margin-bottom: 12px;
         }
 
@@ -67,14 +112,14 @@
             font-size: clamp(2.5rem, 5vw, 4.5rem);
             line-height: 1;
             font-weight: 700;
-            color: #18382a;
+            color: var(--accent);
             margin-bottom: 15px;
         }
 
         .profile-title {
             font-size: 1rem;
             font-weight: 500;
-            color: #526b5d;
+            color: var(--accent-muted);
             margin-bottom: 25px;
         }
 
@@ -83,21 +128,21 @@
             flex-wrap: wrap;
             gap: 10px 25px;
             font-size: 0.8rem;
-            color: #626b64;
+            color: var(--muted);
         }
 
         /* GENERAL SECTIONS */
 
         .section {
             padding: 50px 0;
-            border-bottom: 1px solid #d9d6ca;
+            border-bottom: 1px solid var(--border);
         }
 
         .section-label {
             font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 2px;
-            color: #526b5d;
+            color: var(--accent-muted);
             margin-bottom: 18px;
         }
 
@@ -107,7 +152,7 @@
             max-width: 800px;
             font-size: 1.05rem;
             line-height: 1.9;
-            color: #3f4942;
+            color: var(--body-text);
         }
 
         /* EDUCATION + SKILLS */
@@ -118,29 +163,11 @@
             gap: 70px;
         }
 
-        .education-item {
-            margin-bottom: 25px;
-        }
-
-        .education-year {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #526b5d;
-            margin-bottom: 7px;
-        }
-
-        .education-school {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #18382a;
-            margin-bottom: 5px;
-        }
-
-        .education-degree {
-            font-size: 0.82rem;
-            line-height: 1.6;
-            color: #626b64;
+        .content-text {
+            font-size: 0.9rem;
+            line-height: 1.9;
+            color: var(--body-text);
+            white-space: pre-line;
         }
 
         .skills-list {
@@ -151,115 +178,27 @@
 
         .skill {
             font-size: 0.9rem;
-            color: #3f4942;
+            color: var(--body-text);
             padding-bottom: 7px;
-            border-bottom: 1px solid #b8c1b7;
+            border-bottom: 1px solid var(--accent-muted);
         }
 
         /* WORK EXPERIENCE */
 
-        .experience-item {
-            display: grid;
-            grid-template-columns: 170px 1fr;
-            gap: 35px;
-            padding: 25px 0;
-            border-top: 1px solid #e0ddd2;
-        }
-
-        .experience-item:first-child {
-            border-top: none;
-            padding-top: 0;
-        }
-
-        .experience-date {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #526b5d;
-            line-height: 1.6;
-        }
-
-        .experience-position {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #18382a;
-            margin-bottom: 5px;
-        }
-
-        .experience-company {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #626b64;
-            margin-bottom: 12px;
-        }
-
-        .experience-description {
-            max-width: 650px;
-            font-size: 0.88rem;
-            line-height: 1.8;
-            color: #3f4942;
+        .experience-content {
+            font-size: 0.9rem;
+            line-height: 1.9;
+            color: var(--body-text);
+            white-space: pre-line;
         }
 
         /* PROJECTS */
 
-        .project-item {
-            display: grid;
-            grid-template-columns: 70px 1fr;
-            gap: 25px;
-            padding: 28px 0;
-            border-top: 1px solid #e0ddd2;
-        }
-
-        .project-item:first-child {
-            border-top: none;
-            padding-top: 0;
-        }
-
-        .project-number {
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #526b5d;
-            padding-top: 4px;
-        }
-
-        .project-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #18382a;
-            margin-bottom: 8px;
-        }
-
-        .project-description {
-            max-width: 700px;
-            font-size: 0.88rem;
-            line-height: 1.8;
-            color: #3f4942;
-            margin-bottom: 12px;
-        }
-
-        .project-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px 20px;
-            font-size: 0.75rem;
-            color: #626b64;
-        }
-
-        .project-tech {
-            font-weight: 600;
-            color: #526b5d;
-        }
-
-        .project-link {
-            color: #18382a;
-            font-weight: 600;
-            text-decoration: none;
-            border-bottom: 1px solid #9aa89c;
-        }
-
-        .project-link:hover {
-            border-bottom-color: #18382a;
+        .project-content {
+            font-size: 0.9rem;
+            line-height: 1.9;
+            color: var(--body-text);
+            white-space: pre-line;
         }
 
         /* SOCIAL LINKS */
@@ -275,25 +214,24 @@
         }
 
         .social-link {
-            color: #18382a;
+            color: var(--accent);
             font-size: 0.88rem;
             font-weight: 600;
             text-decoration: none;
             padding-bottom: 6px;
-            border-bottom: 1px solid #9aa89c;
+            border-bottom: 1px solid var(--accent-muted);
             transition: 0.2s ease;
         }
 
         .social-link:hover {
-            color: #526b5d;
-            border-bottom-color: #526b5d;
+            color: var(--accent-muted);
         }
 
         /* FOOTER */
 
         .footer {
             padding-top: 35px;
-            border-top: 1px solid #d9d6ca;
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -304,7 +242,77 @@
 
         .footer-name {
             font-weight: 600;
-            color: #526b5d;
+            color: var(--accent-muted);
+        }
+
+        /* CARDS LAYOUT */
+
+        .layout-cards .section {
+            border-bottom: none;
+            background: #ffffff;
+            padding: 35px;
+            margin-top: 25px;
+            border-radius: 10px;
+        }
+
+        .layout-cards .profile {
+            background: #ffffff;
+            padding: 40px;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .layout-cards .social-section {
+            background: #ffffff;
+            padding: 35px;
+            margin-top: 25px;
+            border-radius: 10px;
+        }
+
+        .layout-cards .footer {
+            margin-top: 25px;
+        }
+
+        /* EDITORIAL LAYOUT */
+
+        .layout-editorial {
+            max-width: 1000px;
+        }
+
+        .layout-editorial .profile {
+            grid-template-columns: 1fr 220px;
+            gap: 60px;
+        }
+
+        .layout-editorial .profile-picture {
+            width: 220px;
+            height: 220px;
+            border-radius: 12px;
+            order: 2;
+        }
+
+        .layout-editorial .profile-content {
+            order: 1;
+        }
+
+        .layout-editorial .section-label {
+            color: var(--accent);
+        }
+
+        .layout-editorial .section {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 45px;
+        }
+
+        .layout-editorial .section-label {
+            margin-bottom: 0;
+        }
+
+        .layout-editorial .social-section {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 45px;
         }
 
         /* RESPONSIVE */
@@ -317,10 +325,21 @@
                 padding: 40px 25px;
             }
 
-            .profile {
+            .profile,
+            .layout-editorial .profile {
                 grid-template-columns: 1fr;
                 text-align: center;
                 justify-items: center;
+            }
+
+            .layout-editorial .profile-picture {
+                order: 1;
+                width: 180px;
+                height: 180px;
+            }
+
+            .layout-editorial .profile-content {
+                order: 2;
             }
 
             .contact {
@@ -332,21 +351,22 @@
                 gap: 45px;
             }
 
-            .experience-item {
+            .layout-editorial .section,
+            .layout-editorial .social-section {
                 grid-template-columns: 1fr;
-                gap: 8px;
+                gap: 15px;
             }
 
-            .project-item {
-                grid-template-columns: 1fr;
-                gap: 8px;
+            .layout-cards .section,
+            .layout-cards .profile,
+            .layout-cards .social-section {
+                padding: 25px;
             }
 
             .footer {
                 flex-direction: column;
                 align-items: flex-start;
             }
-
         }
 
     </style>
@@ -354,13 +374,24 @@
 
 <body>
 
-    <main class="portfolio">
+    <main class="portfolio layout-{{ $layout }}">
 
         <!-- PROFILE -->
 
         <section class="profile">
 
-            <div class="profile-picture"></div>
+            <div class="profile-picture">
+
+                @if ($portfolio->profile_picture)
+                    <img
+                        src="{{ asset('storage/' . $portfolio->profile_picture) }}"
+                        alt="{{ $portfolio->full_name }}"
+                    >
+                @else
+                    <span></span>
+                @endif
+
+            </div>
 
             <div class="profile-content">
 
@@ -369,26 +400,32 @@
                 </div>
 
                 <h1 class="profile-name">
-                    Your Name
+                    {{ $portfolio->full_name }}
                 </h1>
 
                 <p class="profile-title">
-                    Student • Developer • Designer
+                    {{ $portfolio->additional_info ?? 'Student • Developer • Designer' }}
                 </p>
 
                 <div class="contact">
 
-                    <span>
-                        email@example.com
-                    </span>
+                    @if ($portfolio->email)
+                        <span>
+                            {{ $portfolio->email }}
+                        </span>
+                    @endif
 
-                    <span>
-                        +63 900 000 0000
-                    </span>
+                    @if ($portfolio->contact_number)
+                        <span>
+                            {{ $portfolio->contact_number }}
+                        </span>
+                    @endif
 
-                    <span>
-                        Your City, Philippines
-                    </span>
+                    @if ($portfolio->address)
+                        <span>
+                            {{ $portfolio->address }}
+                        </span>
+                    @endif
 
                 </div>
 
@@ -399,21 +436,21 @@
 
         <!-- ABOUT ME -->
 
-        <section class="section">
+        @if ($portfolio->about_me)
 
-            <div class="section-label">
-                ABOUT ME
-            </div>
+            <section class="section">
 
-            <p class="about-text">
-                I am a passionate student and aspiring professional
-                who enjoys learning new skills, working on meaningful
-                projects, and continuously improving my craft. I am
-                interested in creating practical and thoughtful
-                solutions through technology and creativity.
-            </p>
+                <div class="section-label">
+                    ABOUT ME
+                </div>
 
-        </section>
+                <p class="about-text">
+                    {{ $portfolio->about_me }}
+                </p>
+
+            </section>
+
+        @endif
 
 
         <!-- EDUCATION AND SKILLS -->
@@ -424,92 +461,40 @@
 
                 <!-- EDUCATION -->
 
-                <div>
+                @if ($portfolio->educational_background)
 
-                    <div class="section-label">
-                        EDUCATION
-                    </div>
+                    <div>
 
-                    <div class="education-item">
-
-                        <div class="education-year">
-                            2024 — PRESENT
+                        <div class="section-label">
+                            EDUCATION
                         </div>
 
-                        <div class="education-school">
-                            University Name
-                        </div>
-
-                        <div class="education-degree">
-                            Bachelor of Science in Information Technology
+                        <div class="content-text">
+                            {{ $portfolio->educational_background }}
                         </div>
 
                     </div>
 
-                    <div class="education-item">
-
-                        <div class="education-year">
-                            2022 — 2024
-                        </div>
-
-                        <div class="education-school">
-                            Senior High School
-                        </div>
-
-                        <div class="education-degree">
-                            Accountancy, Business and Management
-                        </div>
-
-                    </div>
-
-                </div>
+                @endif
 
 
                 <!-- SKILLS -->
 
-                <div>
+                @if ($portfolio->skills)
 
-                    <div class="section-label">
-                        SKILLS
-                    </div>
+                    <div>
 
-                    <div class="skills-list">
+                        <div class="section-label">
+                            SKILLS
+                        </div>
 
-                        <span class="skill">
-                            Java
-                        </span>
-
-                        <span class="skill">
-                            PHP
-                        </span>
-
-                        <span class="skill">
-                            Laravel
-                        </span>
-
-                        <span class="skill">
-                            MySQL
-                        </span>
-
-                        <span class="skill">
-                            HTML
-                        </span>
-
-                        <span class="skill">
-                            CSS
-                        </span>
-
-                        <span class="skill">
-                            Git
-                        </span>
-
-                        <span class="skill">
-                            UI Design
-                        </span>
+                        <div class="content-text">
+                            {{ $portfolio->skills }}
+                        </div>
 
                     </div>
 
-                </div>
+                @endif
 
             </div>
 
@@ -518,213 +503,119 @@
 
         <!-- WORK EXPERIENCE -->
 
-        <section class="section">
+        @if ($portfolio->work_experience)
 
-            <div class="section-label">
-                WORK EXPERIENCE
-            </div>
+            <section class="section">
 
-
-            <div class="experience-item">
-
-                <div class="experience-date">
-                    2025 — PRESENT
+                <div class="section-label">
+                    WORK EXPERIENCE
                 </div>
 
-                <div>
-
-                    <div class="experience-position">
-                        Position Title
-                    </div>
-
-                    <div class="experience-company">
-                        Company or Organization
-                    </div>
-
-                    <p class="experience-description">
-                        Describe your responsibilities, contributions,
-                        and the experience you gained in this role.
-                        Keep the description concise and focused on
-                        meaningful work.
-                    </p>
-
+                <div class="experience-content">
+                    {{ $portfolio->work_experience }}
                 </div>
 
-            </div>
+            </section>
 
-
-            <div class="experience-item">
-
-                <div class="experience-date">
-                    2024 — 2025
-                </div>
-
-                <div>
-
-                    <div class="experience-position">
-                        Intern / Assistant
-                    </div>
-
-                    <div class="experience-company">
-                        Company or Organization
-                    </div>
-
-                    <p class="experience-description">
-                        Add a short description of your responsibilities,
-                        tasks, projects, or achievements during this
-                        experience.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
+        @endif
 
 
         <!-- PROJECTS -->
 
-        <section class="section">
+        @if ($portfolio->projects)
 
-            <div class="section-label">
-                PROJECTS
-            </div>
+            <section class="section">
 
-
-            <div class="project-item">
-
-                <div class="project-number">
-                    01
+                <div class="section-label">
+                    PROJECTS
                 </div>
 
-                <div>
-
-                    <div class="project-title">
-                        Project Name
-                    </div>
-
-                    <p class="project-description">
-                        A short description of the project, its purpose,
-                        the problem it addresses, and your contribution
-                        to the project.
-                    </p>
-
-                    <div class="project-details">
-
-                        <span class="project-tech">
-                            HTML • CSS • Laravel
-                        </span>
-
-                        <a href="#" class="project-link">
-                            View Project
-                        </a>
-
-                    </div>
-
+                <div class="project-content">
+                    {{ $portfolio->projects }}
                 </div>
 
-            </div>
+            </section>
 
-
-            <div class="project-item">
-
-                <div class="project-number">
-                    02
-                </div>
-
-                <div>
-
-                    <div class="project-title">
-                        Another Project
-                    </div>
-
-                    <p class="project-description">
-                        Add another project that demonstrates your skills,
-                        experience, creativity, or knowledge in your field.
-                    </p>
-
-                    <div class="project-details">
-
-                        <span class="project-tech">
-                            Java • MySQL
-                        </span>
-
-                        <a href="#" class="project-link">
-                            View Project
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="project-item">
-
-                <div class="project-number">
-                    03
-                </div>
-
-                <div>
-
-                    <div class="project-title">
-                        Third Project
-                    </div>
-
-                    <p class="project-description">
-                        Include another relevant project, school project,
-                        personal project, or professional work.
-                    </p>
-
-                    <div class="project-details">
-
-                        <span class="project-tech">
-                            PHP • MySQL
-                        </span>
-
-                        <a href="#" class="project-link">
-                            View Project
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
+        @endif
 
 
         <!-- SOCIAL LINKS -->
 
-        <section class="social-section">
+        @if (
+            $portfolio->website ||
+            $portfolio->linkedin ||
+            $portfolio->github ||
+            $portfolio->social_links
+        )
 
-            <div class="section-label">
-                FIND ME ONLINE
-            </div>
+            <section class="social-section">
 
-            <div class="social-links">
+                <div class="section-label">
+                    FIND ME ONLINE
+                </div>
 
-                <a href="#" class="social-link">
-                    LinkedIn
-                </a>
+                <div class="social-links">
 
-                <a href="#" class="social-link">
-                    GitHub
-                </a>
+                    @if ($portfolio->website)
+                        <a
+                            href="{{ $portfolio->website }}"
+                            class="social-link"
+                            target="_blank"
+                        >
+                            Website
+                        </a>
+                    @endif
 
-                <a href="#" class="social-link">
-                    Personal Website
-                </a>
+                    @if ($portfolio->linkedin)
+                        <a
+                            href="{{ $portfolio->linkedin }}"
+                            class="social-link"
+                            target="_blank"
+                        >
+                            LinkedIn
+                        </a>
+                    @endif
 
-                <a href="#" class="social-link">
-                    Other Social Link
-                </a>
+                    @if ($portfolio->github)
+                        <a
+                            href="{{ $portfolio->github }}"
+                            class="social-link"
+                            target="_blank"
+                        >
+                            GitHub
+                        </a>
+                    @endif
 
-            </div>
+                    @if ($portfolio->social_links)
+                        <span class="social-link">
+                            {{ $portfolio->social_links }}
+                        </span>
+                    @endif
 
-        </section>
+                </div>
+
+            </section>
+
+        @endif
+
+
+        <!-- ADDITIONAL INFORMATION -->
+
+        @if ($portfolio->additional_info)
+
+            <section class="section">
+
+                <div class="section-label">
+                    ADDITIONAL INFORMATION
+                </div>
+
+                <div class="content-text">
+                    {{ $portfolio->additional_info }}
+                </div>
+
+            </section>
+
+        @endif
 
 
         <!-- FOOTER -->
@@ -732,11 +623,11 @@
         <footer class="footer">
 
             <span class="footer-name">
-                Your Name
+                {{ $portfolio->full_name }}
             </span>
 
             <span>
-                © 2026 • Portfolio
+                © {{ date('Y') }} • Portfolio
             </span>
 
         </footer>

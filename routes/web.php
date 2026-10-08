@@ -3,8 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PortfolioController;
 
+
 Route::get('/', [PortfolioController::class, 'home'])
     ->name('home');
+
+
+/*
+|--------------------------------------------------------------------------
+| Portfolio Creation
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/portfolio/create', [PortfolioController::class, 'create'])
     ->name('portfolio.create');
@@ -30,6 +38,19 @@ Route::get('/portfolio/{id}/modern', [PortfolioController::class, 'modern'])
 
 Route::get('/portfolio/{id}/creative', [PortfolioController::class, 'creative'])
     ->name('portfolio.creative');
+
+
+/*
+|--------------------------------------------------------------------------
+| Template Customization
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/portfolio/{id}/customize', [PortfolioController::class, 'customize'])
+    ->name('portfolio.customize');
+
+Route::post('/portfolio/{id}/customize', [PortfolioController::class, 'saveCustomization'])
+    ->name('portfolio.saveCustomization');
 
 
 /*
