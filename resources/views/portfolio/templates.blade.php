@@ -451,7 +451,7 @@
                     </p>
 
                     <a
-                        href="{{ route('portfolio.simple') }}"
+                        href="{{ route('portfolio.simple', $portfolio->id) }}"
                         class="template-button"
                     >
                         PREVIEW TEMPLATE
@@ -512,7 +512,7 @@
                     </p>
 
                     <a
-                        href="{{ route('portfolio.modern') }}"
+                       href="{{ route('portfolio.modern', $portfolio->id) }}"
                         class="template-button"
                     >
                         PREVIEW TEMPLATE
@@ -556,7 +556,7 @@
                     </p>
 
                     <a
-                        href="{{ route('portfolio.creative') }}"
+                        href="{{ route('portfolio.creative', $portfolio->id) }}"
                         class="template-button"
                     >
                         PREVIEW TEMPLATE
