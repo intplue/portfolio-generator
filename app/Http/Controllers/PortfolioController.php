@@ -94,6 +94,60 @@ class PortfolioController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | Simple Template
+    |--------------------------------------------------------------------------
+    */
+
+    public function simple($id)
+    {
+        $portfolio = Portfolio::findOrFail($id);
+
+        $portfolio->update([
+            'template' => 'simple',
+        ]);
+
+        return view('portfolio.simple', compact('portfolio'));
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Modern Template
+    |--------------------------------------------------------------------------
+    */
+
+    public function modern($id)
+    {
+        $portfolio = Portfolio::findOrFail($id);
+
+        $portfolio->update([
+            'template' => 'modern',
+        ]);
+
+        return view('portfolio.modern', compact('portfolio'));
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Creative Template
+    |--------------------------------------------------------------------------
+    */
+
+    public function creative($id)
+    {
+        $portfolio = Portfolio::findOrFail($id);
+
+        $portfolio->update([
+            'template' => 'creative',
+        ]);
+
+        return view('portfolio.creative', compact('portfolio'));
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Portfolio Preview
     |--------------------------------------------------------------------------
     */
@@ -102,7 +156,11 @@ class PortfolioController extends Controller
     {
         $portfolio = Portfolio::findOrFail($id);
 
-        return view('portfolio.preview', compact('portfolio'));
+        return match ($portfolio->template) {
+            'modern' => view('portfolio.modern', compact('portfolio')),
+            'creative' => view('portfolio.creative', compact('portfolio')),
+            default => view('portfolio.simple', compact('portfolio')),
+        };
     }
 
 

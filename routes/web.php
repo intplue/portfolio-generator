@@ -12,6 +12,7 @@ Route::get('/portfolio/create', [PortfolioController::class, 'create'])
 Route::post('/portfolio', [PortfolioController::class, 'store'])
     ->name('portfolio.store');
 
+
 /*
 |--------------------------------------------------------------------------
 | Template Selection
@@ -21,6 +22,16 @@ Route::post('/portfolio', [PortfolioController::class, 'store'])
 Route::get('/portfolio/{id}/templates', [PortfolioController::class, 'templates'])
     ->name('portfolio.templates');
 
+Route::get('/portfolio/{id}/simple', [PortfolioController::class, 'simple'])
+    ->name('portfolio.simple');
+
+Route::get('/portfolio/{id}/modern', [PortfolioController::class, 'modern'])
+    ->name('portfolio.modern');
+
+Route::get('/portfolio/{id}/creative', [PortfolioController::class, 'creative'])
+    ->name('portfolio.creative');
+
+
 /*
 |--------------------------------------------------------------------------
 | Portfolio Preview
@@ -29,6 +40,7 @@ Route::get('/portfolio/{id}/templates', [PortfolioController::class, 'templates'
 
 Route::get('/portfolio/{id}/preview', [PortfolioController::class, 'preview'])
     ->name('portfolio.preview');
+
 
 /*
 |--------------------------------------------------------------------------
