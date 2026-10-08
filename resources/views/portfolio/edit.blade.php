@@ -10,376 +10,302 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap"
         rel="stylesheet"
     >
 
     <style>
-
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Raleway', sans-serif;
+            margin: 0;
             background: #f3efe3;
-            color: #18382a;
+            color: #202722;
+            font-family: 'Raleway', sans-serif;
         }
-
-        /* NAVBAR */
 
         .navbar {
             width: 100%;
-            padding: 25px 7%;
+            padding: 24px 7%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f3efe3;
         }
 
         .logo {
-            font-size: 1rem;
+            color: #18382a;
+            font-size: 18px;
             font-weight: 700;
             letter-spacing: 1px;
-            color: #18382a;
-            text-decoration: none;
         }
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 28px;
         }
 
         .nav-links a {
-            font-size: 0.75rem;
+            color: #18382a;
+            text-decoration: none;
+            font-size: 13px;
             font-weight: 600;
             letter-spacing: 1px;
-            text-decoration: none;
-            color: #526b5d;
         }
 
-        .nav-links a:hover {
-            color: #18382a;
+        .page {
+            width: min(900px, 88%);
+            margin: 45px auto 80px;
         }
-
-        /* PAGE HEADER */
 
         .page-header {
-            width: 86%;
-            max-width: 1100px;
-            margin: 50px auto 35px;
+            margin-bottom: 35px;
         }
 
-        .page-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 2px;
+        .page-header h1 {
+            margin: 0 0 10px;
+            color: #18382a;
+            font-size: 38px;
+        }
+
+        .page-header p {
+            margin: 0;
             color: #526b5d;
-            margin-bottom: 12px;
-        }
-
-        .page-title {
-            font-size: clamp(2.3rem, 5vw, 4rem);
-            line-height: 1.05;
-            font-weight: 700;
-            color: #18382a;
-            margin-bottom: 15px;
-        }
-
-        .page-description {
-            max-width: 650px;
-            font-size: 0.95rem;
+            font-size: 15px;
             line-height: 1.7;
-            color: #626b64;
         }
 
-        /* FORM */
-
-        .form-container {
-            width: 86%;
-            max-width: 1100px;
-            margin: 0 auto 70px;
+        .form-card {
+            padding: 35px;
             background: #faf8f2;
-            padding: 50px;
-            border-radius: 10px;
+            border: 1px solid #ded8c9;
+            border-radius: 12px;
         }
 
-        .form-section {
-            padding: 35px 0;
-            border-bottom: 1px solid #dedbd0;
+        .section {
+            margin-bottom: 35px;
         }
 
-        .form-section:first-child {
-            padding-top: 0;
+        .section:last-child {
+            margin-bottom: 0;
         }
 
-        .form-section:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .section-title {
-            font-size: 1rem;
-            font-weight: 700;
+        .section h2 {
+            margin: 0 0 20px;
+            padding-bottom: 8px;
             color: #18382a;
-            margin-bottom: 8px;
+            font-size: 20px;
         }
 
-        .section-description {
-            font-size: 0.8rem;
-            line-height: 1.6;
-            color: #7a817b;
-            margin-bottom: 25px;
+        .field {
+            margin-bottom: 20px;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 22px 25px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group.full {
-            grid-column: 1 / -1;
+        .field:last-child {
+            margin-bottom: 0;
         }
 
         label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #3f4942;
+            display: block;
             margin-bottom: 8px;
+            color: #18382a;
+            font-size: 13px;
+            font-weight: 700;
         }
 
         input,
         textarea {
             width: 100%;
-            border: 1px solid #d1d3ca;
-            background: #ffffff;
-            color: #18382a;
-            font-family: 'Raleway', sans-serif;
-            font-size: 0.85rem;
-            padding: 13px 15px;
+            padding: 13px 14px;
+            border: 1px solid #cfc9ba;
             border-radius: 8px;
+            background: #ffffff;
+            color: #202722;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
             outline: none;
-            transition: 0.2s ease;
         }
 
         input:focus,
         textarea:focus {
             border-color: #526b5d;
-            box-shadow: 0 0 0 3px rgba(82, 107, 93, 0.08);
         }
 
         textarea {
-            min-height: 130px;
+            min-height: 120px;
             resize: vertical;
-            line-height: 1.7;
+            line-height: 1.6;
         }
 
-        input::placeholder,
-        textarea::placeholder {
-            color: #a1a6a1;
-        }
-
-        /* PROFILE PICTURE */
-
-        .picture-note {
-            font-size: 0.7rem;
-            color: #7a817b;
-            margin-top: 7px;
-            line-height: 1.5;
-        }
-
-        .current-picture {
+        .current-image {
             margin-bottom: 15px;
         }
 
-        .picture-preview {
+        .current-image img {
+            display: block;
             width: 110px;
             height: 110px;
-            border-radius: 50%;
-            background: #d8ddd3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #526b5d;
-            font-size: 0.7rem;
-            text-align: center;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #ded8c9;
         }
 
-        /* BUTTONS */
+        .current-image p {
+            margin: 8px 0 0;
+            color: #526b5d;
+            font-size: 12px;
+        }
 
-        .form-actions {
+        .error-box {
+            margin-bottom: 25px;
+            padding: 15px 18px;
+            border-radius: 10px;
+            background: #eadbd6;
+            color: #713f32;
+            font-size: 13px;
+        }
+
+        .error-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 15px;
-            margin-top: 40px;
+            margin-top: 35px;
+        }
+
+        .back-button,
+        .save-button {
+            display: inline-block;
+            padding: 13px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
         }
 
         .back-button {
-            color: #526b5d;
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #aab4ab;
-        }
-
-        .back-button:hover {
+            background: #e5e1d4;
             color: #18382a;
-            border-bottom-color: #18382a;
         }
 
         .save-button {
             border: none;
             background: #18382a;
             color: #ffffff;
-            padding: 14px 30px;
-            border-radius: 8px;
-            font-family: 'Raleway', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s ease;
         }
-
-        .save-button:hover {
-            background: #526b5d;
-        }
-
-        /* RESPONSIVE */
 
         @media (max-width: 700px) {
-
             .navbar {
-                padding: 22px 5%;
+                padding: 20px 6%;
+                align-items: flex-start;
+                gap: 20px;
             }
 
             .nav-links {
-                gap: 15px;
+                gap: 14px;
+                flex-wrap: wrap;
+                justify-content: flex-end;
             }
 
-            .page-header {
+            .page {
                 width: 90%;
-                margin-top: 35px;
+                margin-top: 30px;
             }
 
-            .form-container {
-                width: 90%;
-                padding: 30px 25px;
+            .page-header h1 {
+                font-size: 30px;
             }
 
-            .form-grid {
-                grid-template-columns: 1fr;
+            .form-card {
+                padding: 24px;
             }
 
-            .form-group.full {
-                grid-column: auto;
-            }
-
-            .form-actions {
+            .actions {
                 flex-direction: column-reverse;
                 align-items: stretch;
             }
 
+            .back-button,
             .save-button {
                 width: 100%;
+                text-align: center;
             }
-
-            .back-button {
-                align-self: center;
-            }
-
         }
-
     </style>
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
-
     <nav class="navbar">
 
-        <a href="{{ route('home') }}" class="logo">
+        <div class="logo">
             Portfolio Generator
-        </a>
+        </div>
 
         <div class="nav-links">
-
-            <a href="{{ route('home') }}">
-                HOME
-            </a>
-
-            <a href="{{ route('home') }}#about">
-                ABOUT
-            </a>
-
-            <a href="{{ route('home') }}#help">
-                HELP
-            </a>
-
+            <a href="{{ route('home') }}">HOME</a>
+            <a href="{{ route('portfolio.manage') }}">MANAGE</a>
         </div>
 
     </nav>
 
 
-    <!-- PAGE HEADER -->
+    <main class="page">
 
-    <header class="page-header">
+        <div class="page-header">
 
-        <div class="page-label">
-            PORTFOLIO GENERATOR
+            <h1>Edit Portfolio</h1>
+
+            <p>
+                Update your portfolio information and save your changes.
+            </p>
+
         </div>
 
-        <h1 class="page-title">
-            Edit your portfolio.
-        </h1>
 
-        <p class="page-description">
-            Update your information below. Your changes will be saved
-            and reflected in your generated portfolio.
-        </p>
+        @if($errors->any())
 
-    </header>
+            <div class="error-box">
 
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
 
-    <!-- FORM -->
+            </div>
 
-    <main class="form-container">
-
-        <form
-            action="#"
-            method="POST"
-            enctype="multipart/form-data"
-        >
-
-            @csrf
-            @method('PUT')
+        @endif
 
 
-            <!-- PERSONAL INFORMATION -->
+        <div class="form-card">
 
-            <section class="form-section">
+            <form
+                action="{{ route('portfolio.update', $portfolio->id) }}"
+                method="POST"
+                enctype="multipart/form-data"
+            >
 
-                <h2 class="section-title">
-                    Personal Information
-                </h2>
+                @csrf
+                @method('PUT')
 
-                <p class="section-description">
-                    Keep your basic contact information up to date.
-                </p>
 
-                <div class="form-grid">
+                <!-- PERSONAL INFORMATION -->
 
-                    <div class="form-group">
+                <section class="section">
+
+                    <h2>Personal Information</h2>
+
+                    <div class="field">
 
                         <label for="full_name">
                             Full Name
@@ -389,31 +315,31 @@
                             type="text"
                             id="full_name"
                             name="full_name"
-                            value="{{ old('full_name', $portfolio->full_name ?? '') }}"
-                            placeholder="Enter your full name"
+                            value="{{ old('full_name', $portfolio->full_name) }}"
+                            required
                         >
 
                     </div>
 
 
-                    <div class="form-group">
+                    <div class="field">
 
                         <label for="email">
-                            Email Address
+                            Email
                         </label>
 
                         <input
                             type="email"
                             id="email"
                             name="email"
-                            value="{{ old('email', $portfolio->email ?? '') }}"
-                            placeholder="you@example.com"
+                            value="{{ old('email', $portfolio->email) }}"
+                            required
                         >
 
                     </div>
 
 
-                    <div class="form-group">
+                    <div class="field">
 
                         <label for="contact_number">
                             Contact Number
@@ -423,121 +349,90 @@
                             type="text"
                             id="contact_number"
                             name="contact_number"
-                            value="{{ old('contact_number', $portfolio->contact_number ?? '') }}"
-                            placeholder="+63 900 000 0000"
+                            value="{{ old('contact_number', $portfolio->contact_number) }}"
                         >
 
                     </div>
 
 
-                    <div class="form-group">
+                    <div class="field">
 
                         <label for="address">
                             Address
                         </label>
 
-                        <input
-                            type="text"
+                        <textarea
                             id="address"
                             name="address"
-                            value="{{ old('address', $portfolio->address ?? '') }}"
-                            placeholder="City, Province, Country"
+                        >{{ old('address', $portfolio->address) }}</textarea>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="profile_picture">
+                            Profile Picture
+                        </label>
+
+                        @if($portfolio->profile_picture)
+
+                            <div class="current-image">
+
+                                <img
+                                    src="{{ asset('storage/' . $portfolio->profile_picture) }}"
+                                    alt="Current profile picture"
+                                >
+
+                                <p>
+                                    Current profile picture
+                                </p>
+
+                            </div>
+
+                        @endif
+
+                        <input
+                            type="file"
+                            id="profile_picture"
+                            name="profile_picture"
+                            accept="image/*"
                         >
 
                     </div>
 
-                </div>
-
-            </section>
+                </section>
 
 
-            <!-- PROFILE PICTURE -->
+                <!-- ABOUT -->
 
-            <section class="form-section">
+                <section class="section">
 
-                <h2 class="section-title">
-                    Profile Picture
-                </h2>
+                    <h2>About You</h2>
 
-                <p class="section-description">
-                    Update the image that will appear on your portfolio.
-                </p>
+                    <div class="field">
 
-                <div class="current-picture">
+                        <label for="about_me">
+                            About Me
+                        </label>
 
-                    <div class="picture-preview">
-                        Current Photo
+                        <textarea
+                            id="about_me"
+                            name="about_me"
+                        >{{ old('about_me', $portfolio->about_me) }}</textarea>
+
                     </div>
 
-                </div>
-
-                <div class="form-group">
-
-                    <label for="profile_picture">
-                        New Profile Picture
-                    </label>
-
-                    <input
-                        type="file"
-                        id="profile_picture"
-                        name="profile_picture"
-                        accept="image/*"
-                    >
-
-                    <p class="picture-note">
-                        Upload a JPG, JPEG, PNG, or WEBP image.
-                    </p>
-
-                </div>
-
-            </section>
+                </section>
 
 
-            <!-- ABOUT -->
+                <!-- EDUCATION AND EXPERIENCE -->
 
-            <section class="form-section">
+                <section class="section">
 
-                <h2 class="section-title">
-                    About You
-                </h2>
+                    <h2>Education & Experience</h2>
 
-                <p class="section-description">
-                    Tell visitors who you are, what you do, and what
-                    you are interested in.
-                </p>
-
-                <div class="form-group">
-
-                    <label for="about_me">
-                        About Me
-                    </label>
-
-                    <textarea
-                        id="about_me"
-                        name="about_me"
-                        placeholder="Write a short introduction about yourself..."
-                    >{{ old('about_me', $portfolio->about_me ?? '') }}</textarea>
-
-                </div>
-
-            </section>
-
-
-            <!-- EDUCATION AND EXPERIENCE -->
-
-            <section class="form-section">
-
-                <h2 class="section-title">
-                    Education & Experience
-                </h2>
-
-                <p class="section-description">
-                    Add your educational background and relevant work experience.
-                </p>
-
-                <div class="form-grid">
-
-                    <div class="form-group full">
+                    <div class="field">
 
                         <label for="educational_background">
                             Educational Background
@@ -546,13 +441,12 @@
                         <textarea
                             id="educational_background"
                             name="educational_background"
-                            placeholder="Example: Bachelor of Science in Information Technology — University Name, 2024–Present"
-                        >{{ old('educational_background', $portfolio->educational_background ?? '') }}</textarea>
+                        >{{ old('educational_background', $portfolio->educational_background) }}</textarea>
 
                     </div>
 
 
-                    <div class="form-group full">
+                    <div class="field">
 
                         <label for="work_experience">
                             Work Experience
@@ -561,31 +455,20 @@
                         <textarea
                             id="work_experience"
                             name="work_experience"
-                            placeholder="Describe your previous work, internship, volunteer, or relevant experience..."
-                        >{{ old('work_experience', $portfolio->work_experience ?? '') }}</textarea>
+                        >{{ old('work_experience', $portfolio->work_experience) }}</textarea>
 
                     </div>
 
-                </div>
-
-            </section>
+                </section>
 
 
-            <!-- SKILLS AND PROJECTS -->
+                <!-- SKILLS AND PROJECTS -->
 
-            <section class="form-section">
+                <section class="section">
 
-                <h2 class="section-title">
-                    Skills & Projects
-                </h2>
+                    <h2>Skills & Projects</h2>
 
-                <p class="section-description">
-                    Highlight the skills and projects you want visitors to see.
-                </p>
-
-                <div class="form-grid">
-
-                    <div class="form-group">
+                    <div class="field">
 
                         <label for="skills">
                             Skills
@@ -594,13 +477,12 @@
                         <textarea
                             id="skills"
                             name="skills"
-                            placeholder="Java, Laravel, MySQL, HTML, CSS..."
-                        >{{ old('skills', $portfolio->skills ?? '') }}</textarea>
+                        >{{ old('skills', $portfolio->skills) }}</textarea>
 
                     </div>
 
 
-                    <div class="form-group">
+                    <div class="field">
 
                         <label for="projects">
                             Projects
@@ -609,152 +491,126 @@
                         <textarea
                             id="projects"
                             name="projects"
-                            placeholder="Project name, description, technologies used..."
-                        >{{ old('projects', $portfolio->projects ?? '') }}</textarea>
+                        >{{ old('projects', $portfolio->projects) }}</textarea>
 
                     </div>
 
-                </div>
-
-            </section>
+                </section>
 
 
-            <!-- SOCIAL LINKS -->
+                <!-- SOCIAL LINKS -->
 
-            <section class="form-section">
+                <section class="section">
 
-                <h2 class="section-title">
-                    Social Media & Websites
-                </h2>
+                    <h2>Social Media & Websites</h2>
 
-                <p class="section-description">
-                    Add links where visitors can learn more about you or your work.
-                </p>
-
-                <div class="form-grid">
-
-                    <div class="form-group">
+                    <div class="field">
 
                         <label for="website">
-                            Personal Website
+                            Website
                         </label>
 
                         <input
-                            type="url"
+                            type="text"
                             id="website"
                             name="website"
-                            value="{{ old('website', $portfolio->website ?? '') }}"
-                            placeholder="https://yourwebsite.com"
+                            value="{{ old('website', $portfolio->website) }}"
                         >
 
                     </div>
 
 
-                    <div class="form-group">
+                    <div class="field">
 
                         <label for="linkedin">
                             LinkedIn
                         </label>
 
                         <input
-                            type="url"
+                            type="text"
                             id="linkedin"
                             name="linkedin"
-                            value="{{ old('linkedin', $portfolio->linkedin ?? '') }}"
-                            placeholder="https://linkedin.com/in/yourname"
+                            value="{{ old('linkedin', $portfolio->linkedin) }}"
                         >
 
                     </div>
 
 
-                    <div class="form-group">
+                    <div class="field">
 
                         <label for="github">
                             GitHub
                         </label>
 
                         <input
-                            type="url"
+                            type="text"
                             id="github"
                             name="github"
-                            value="{{ old('github', $portfolio->github ?? '') }}"
-                            placeholder="https://github.com/yourusername"
+                            value="{{ old('github', $portfolio->github) }}"
                         >
 
                     </div>
 
 
-                    <div class="form-group">
+                    <div class="field">
 
                         <label for="social_links">
                             Other Social Links
                         </label>
 
-                        <input
-                            type="text"
+                        <textarea
                             id="social_links"
                             name="social_links"
-                            value="{{ old('social_links', $portfolio->social_links ?? '') }}"
-                            placeholder="Instagram, Facebook, Behance..."
-                        >
+                        >{{ old('social_links', $portfolio->social_links) }}</textarea>
 
                     </div>
 
+                </section>
+
+
+                <!-- ADDITIONAL INFORMATION -->
+
+                <section class="section">
+
+                    <h2>Additional Information</h2>
+
+                    <div class="field">
+
+                        <label for="additional_info">
+                            Additional Information
+                        </label>
+
+                        <textarea
+                            id="additional_info"
+                            name="additional_info"
+                        >{{ old('additional_info', $portfolio->additional_info) }}</textarea>
+
+                    </div>
+
+                </section>
+
+
+                <div class="actions">
+
+                    <a
+                        href="{{ route('portfolio.manage') }}"
+                        class="back-button"
+                    >
+                        CANCEL
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="save-button"
+                    >
+                        SAVE CHANGES
+                    </button>
+
                 </div>
 
-            </section>
+            </form>
 
-
-            <!-- ADDITIONAL INFORMATION -->
-
-            <section class="form-section">
-
-                <h2 class="section-title">
-                    Additional Information
-                </h2>
-
-                <p class="section-description">
-                    Add anything else you would like to include in your portfolio.
-                </p>
-
-                <div class="form-group">
-
-                    <label for="additional_info">
-                        Additional Information
-                    </label>
-
-                    <textarea
-                        id="additional_info"
-                        name="additional_info"
-                        placeholder="Awards, certifications, interests, achievements, or other information..."
-                    >{{ old('additional_info', $portfolio->additional_info ?? '') }}</textarea>
-
-                </div>
-
-            </section>
-
-
-            <!-- ACTIONS -->
-
-            <div class="form-actions">
-
-                <a
-                    href="{{ route('portfolio.manage') }}"
-                    class="back-button"
-                >
-                    ← Back to Manage
-                </a>
-
-                <button
-                    type="submit"
-                    class="save-button"
-                >
-                    Save Changes
-                </button>
-
-            </div>
-
-        </form>
+        </div>
 
     </main>
 
