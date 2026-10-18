@@ -66,6 +66,7 @@
             line-height: 1.65;
         }
 
+<<<<<<< HEAD
         a {
             color: inherit;
             overflow-wrap: anywhere;
@@ -83,6 +84,29 @@
                 ),
                 var(--sage);
             background-size: 17px 17px;
+=======
+        /* HEADER */
+
+        .profile {
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 50px;
+            align-items: center;
+            background: var(--accent);
+            color: #ffffff;
+            padding: 55px;
+            border-radius: 12px;
+            margin-bottom: 35px;
+        }
+
+        .profile-picture {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            background: var(--accent-light);
+            overflow: hidden;
+            order: 2;
+>>>>>>> d29c88f (Update portfolio scrapbook design)
         }
 
         /* Top navigation */
@@ -217,6 +241,7 @@
             object-fit: cover;
         }
 
+<<<<<<< HEAD
         .polaroid-caption {
             position: absolute;
             right: 0;
@@ -226,6 +251,10 @@
             font-family: Georgia, serif;
             font-size: 0.9rem;
             text-align: center;
+=======
+        .profile-content {
+            order: 1;
+>>>>>>> d29c88f (Update portfolio scrapbook design)
         }
 
         .contact-card {
@@ -255,6 +284,7 @@
         .contact-label {
             color: var(--muted);
             font-size: 0.7rem;
+<<<<<<< HEAD
             font-weight: bold;
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -269,6 +299,19 @@
             font-size: 0.76rem;
             font-weight: bold;
             text-decoration: none;
+=======
+            font-weight: 700;
+            letter-spacing: 2px;
+            opacity: 0.75;
+            margin-bottom: 12px;
+        }
+
+        .profile-name {
+            font-size: clamp(2.3rem, 5vw, 4.5rem);
+            line-height: 1;
+            font-weight: 800;
+            margin-bottom: 18px;
+>>>>>>> d29c88f (Update portfolio scrapbook design)
         }
 
         .intro-copy {
@@ -306,9 +349,20 @@
             font-weight: bold;
         }
 
+<<<<<<< HEAD
         .intro-title span {
             color: var(--red);
             font-style: italic;
+=======
+        /* SECTIONS */
+
+        .section {
+            margin-bottom: 35px;
+            padding: 35px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+>>>>>>> d29c88f (Update portfolio scrapbook design)
         }
 
         .intro-description {
@@ -320,7 +374,26 @@
             overflow-wrap: anywhere;
         }
 
+<<<<<<< HEAD
         .intro-details {
+=======
+        /* GRID */
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .two-column .section {
+            margin-bottom: 0;
+        }
+
+        /* SKILLS */
+
+        .skills-list {
+>>>>>>> d29c88f (Update portfolio scrapbook design)
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
@@ -335,6 +408,7 @@
             transform: rotate(-1deg);
         }
 
+<<<<<<< HEAD
         /* Lower scrapbook area */
 
         .scrapbook-content {
@@ -372,6 +446,17 @@
         .education-paper {
             transform: rotate(-1.5deg);
         }
+=======
+        /* PROJECTS */
+
+        .project-content {
+            padding: 20px;
+            border-left: 4px solid var(--accent-muted);
+            background: #f7f8f9;
+        }
+
+        /* SOCIAL */
+>>>>>>> d29c88f (Update portfolio scrapbook design)
 
         .experience-paper {
             transform: rotate(1deg);
@@ -627,7 +712,16 @@
             overflow-wrap: anywhere;
         }
 
+<<<<<<< HEAD
         /* Footer */
+=======
+        .social-link:hover {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        /* FOOTER */
+>>>>>>> d29c88f (Update portfolio scrapbook design)
 
         .footer {
             padding: 25px 20px;
@@ -642,6 +736,7 @@
             color: #d99b86;
         }
 
+<<<<<<< HEAD
         /* Responsive layout */
 
         @media (max-width: 850px) {
@@ -660,6 +755,79 @@
 
             .paper {
                 padding: 30px 23px;
+=======
+        /* STANDARD */
+
+        .layout-standard .section {
+            box-shadow: 0 5px 20px rgba(20, 30, 40, 0.04);
+        }
+
+        /* CARDS */
+
+        .layout-cards .section {
+            box-shadow: 0 10px 30px rgba(20, 30, 40, 0.08);
+            border: none;
+        }
+
+        .layout-cards .profile {
+            box-shadow: 0 12px 35px rgba(20, 30, 40, 0.15);
+        }
+
+        .layout-cards .social-section {
+            box-shadow: 0 10px 30px rgba(20, 30, 40, 0.08);
+        }
+
+        /* EDITORIAL */
+
+        .layout-editorial {
+            max-width: 1050px;
+        }
+
+        .layout-editorial .profile {
+            grid-template-columns: 180px 1fr;
+        }
+
+        .layout-editorial .profile-picture {
+            order: 1;
+        }
+
+        .layout-editorial .profile-content {
+            order: 2;
+        }
+
+        .layout-editorial .two-column {
+            grid-template-columns: 1.2fr 0.8fr;
+        }
+
+        .layout-editorial .section {
+            border-radius: 0;
+            border-left: 5px solid var(--accent);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 750px) {
+
+            .portfolio {
+                width: 94%;
+                margin: 25px auto;
+                padding: 25px;
+            }
+
+            .profile,
+            .layout-editorial .profile {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+                padding: 35px 25px;
+            }
+
+            .profile-picture,
+            .layout-editorial .profile-picture {
+                order: 1;
+                width: 150px;
+                height: 150px;
+>>>>>>> d29c88f (Update portfolio scrapbook design)
             }
 
             .ribbon {
@@ -668,9 +836,26 @@
             }
         }
 
+<<<<<<< HEAD
         @media (max-width: 650px) {
             .topbar {
                 align-items: flex-start;
+=======
+            .contact {
+                justify-content: center;
+            }
+
+            .two-column,
+            .layout-editorial .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 28px;
+            }
+
+            .footer {
+>>>>>>> d29c88f (Update portfolio scrapbook design)
                 flex-direction: column;
                 padding: 22px 6%;
             }
@@ -730,6 +915,7 @@
             }
         }
 
+<<<<<<< HEAD
         @media (prefers-reduced-motion: no-preference) {
             .navigation a,
             .portfolio-link,
@@ -737,6 +923,8 @@
                 transition: color 0.2s ease;
             }
         }
+=======
+>>>>>>> d29c88f (Update portfolio scrapbook design)
     </style>
 </head>
 
@@ -826,11 +1014,17 @@
                     Hi, I'm <span>{{ $name }}</span>
                 </h1>
 
+<<<<<<< HEAD
                 @if (!empty($portfolio->additional_info))
                     <p class="eyebrow">
                         {{ $portfolio->additional_info }}
                     </p>
                 @endif
+=======
+                <p class="profile-title">
+                    {{ $portfolio->additional_info ?? 'Student • Developer • Designer' }}
+                </p>
+>>>>>>> d29c88f (Update portfolio scrapbook design)
 
                 <div class="intro-description">{{ $about ?: 'Welcome to my little corner of the internet. Explore my background, skills, and work below.' }}</div>
 
