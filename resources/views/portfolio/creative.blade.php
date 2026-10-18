@@ -11,25 +11,28 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@400;500;600;700;800&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    @php
-        $imageUrl = $portfolio->profile_picture
-            ? asset('storage/' . $portfolio->profile_picture)
-            : null;
+   @php
+    $imageUrl = $portfolio->profile_picture
+        ? asset('storage/' . $portfolio->profile_picture)
+        : null;
 
-        $skills = preg_split('/[,;\n]+/', $portfolio->skills ?? '');
+    $skills = preg_split('/[,;\n]+/', $portfolio->skills ?? '');
 
-        $skills = array_filter(array_map('trim', $skills));
+    $skills = array_filter(array_map('trim', $skills));
 
-        $initials = collect(explode(' ', trim($portfolio->full_name)))
-            ->filter()
-            ->take(2)
-            ->map(fn ($word) => strtoupper(substr($word, 0, 1)))
-            ->implode('');
+    $initials = collect(explode(' ', trim($portfolio->full_name)))
+        ->filter()
+        ->take(2)
+        ->map(fn ($word) => strtoupper(substr($word, 0, 1)))
+        ->implode('');
 
-        $websiteUrl = $portfolio->website ?? '';
-        $linkedinUrl = $portfolio->linkedin ?? '';
-        $githubUrl = $portfolio->github ?? '';
-    @endphp
+    $websiteUrl = $portfolio->website ?? '';
+    $linkedinUrl = $portfolio->linkedin ?? '';
+    $githubUrl = $portfolio->github ?? '';
+
+    $accentColor = $portfolio->accent_color ?: '#8b1e3f';
+    $layoutStyle = $portfolio->layout_style ?: 'standard';
+@endphp
 
     <style>
         :root {
