@@ -1,75 +1,160 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $portfolio->full_name }} — Creative Template</title>
+    <title>{{ $portfolio->full_name ?? 'My Portfolio' }} | Creative Portfolio</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@400;500;600;700;800&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     @php
-        $imageUrl = $portfolio->profile_picture
-            ? asset('storage/' . $portfolio->profile_picture)
-            : null;
+        /*
+        |--------------------------------------------------------------------------
+        | Accent color
+        |--------------------------------------------------------------------------
+        | Supports the green, blue, and plum presets, as well as a custom hex code.
+        */
+        $savedAccent = $portfolio->accent_color ?? 'plum';
 
-        $skills = preg_split('/[,;\n]+/', $portfolio->skills ?? '');
+        $accentPresets = [
+            'green' => '#526b5d',
+            'blue'  => '#3d6fa8',
+            'plum'  => '#432a46',
+        ];
 
-        $skills = array_filter(array_map('trim', $skills));
+        $accent = $accentPresets[$savedAccent] ?? (
+            is_string($savedAccent) &&
+            preg_match('/^#[0-9a-fA-F]{6}$/', $savedAccent)
+                ? $savedAccent
+                : '#432a46'
+        );
 
-        $initials = collect(explode(' ', trim($portfolio->full_name)))
-            ->filter()
-            ->take(2)
-            ->map(fn ($word) => strtoupper(substr($word, 0, 1)))
-            ->implode('');
+        /*
+        |--------------------------------------------------------------------------
+        | Layout style
+        |--------------------------------------------------------------------------
+        */
+        $savedLayout = $portfolio->layout_style ?? 'standard';
 
-        $websiteUrl = $portfolio->website ?? '';
-        $linkedinUrl = $portfolio->linkedin ?? '';
-        $githubUrl = $portfolio->github ?? '';
+        $layout = in_array(
+            $savedLayout,
+            ['standard', 'cards', 'editorial'],
+            true
+        ) ? $savedLayout : 'standard';
+
+        /*
+        |--------------------------------------------------------------------------
+        | Portfolio content
+        |--------------------------------------------------------------------------
+        */
+        $fullName = $portfolio->full_name ?? 'Your Name';
+        $aboutMe = $portfolio->about_me ?? '';
+        $email = $portfolio->email ?? '';
+        $website = $portfolio->website ?? '';
+        $linkedin = $portfolio->linkedin ?? '';
+        $github = $portfolio->github ?? '';
+        $address = $portfolio->address ?? '';
+
+        /*
+        |--------------------------------------------------------------------------
+        | Convert list-like database values into arrays.
+        |--------------------------------------------------------------------------
+        */
+        $toList = function ($value) {
+            if (is_array($value)) {
+                return $value;
+            }
+
+            if (is_object($value)) {
+                return (array) $value;
+            }
+
+            if (!is_string($value) || trim($value) === '') {
+                return [];
+            }
+
+            $decoded = json_decode($value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+
+            return preg_split('/[\r\n,]+/', $value, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        };
+
+        $skills = $toList($portfolio->skills ?? []);
+        $education = $toList($portfolio->educational_background ?? []);
+        $experience = $toList($portfolio->work_experience ?? []);
+        $projects = $toList($portfolio->projects ?? []);
+        $additionalInfo = $toList($portfolio->additional_info ?? []);
+
+        $getValue = function ($item, $keys, $fallback = '') {
+            foreach ($keys as $key) {
+                if (is_array($item) && isset($item[$key]) && $item[$key] !== '') {
+                    return $item[$key];
+                }
+
+                if (is_object($item) && isset($item->$key) && $item->$key !== '') {
+                    return $item->$key;
+                }
+            }
+
+            return is_string($item) ? $item : $fallback;
+        };
+
+        $profilePicture = $portfolio->profile_picture ?? null;
     @endphp
 
     <style>
         :root {
-            --navy: #1a2530;
-            --navy-light: #263746;
-            --burgundy: #8b1e3f;
-            --burgundy-light: #f6e9ed;
+            --accent: {{ $accent }};
+            --accent-soft: color-mix(in srgb, var(--accent) 10%, white);
+            --accent-medium: color-mix(in srgb, var(--accent) 22%, white);
+            --accent-dark: color-mix(in srgb, var(--accent) 82%, black);
+
+            --paper: #fbf8f3;
+            --paper-dark: #f2ece3;
             --white: #ffffff;
-            --paper: #faf9f6;
-            --cream: #f0eee8;
-            --gray: #777d84;
-            --light-gray: #e5e5e2;
-            --line: #d9dadd;
-            --serif: 'Playfair Display', Georgia, serif;
-            --sans: 'DM Sans', sans-serif;
-            --mono: 'DM Mono', monospace;
-            --script: 'Caveat', cursive;
+            --ink: #29252a;
+            --muted: #827981;
+            --line: #e5dcd5;
+            --dark: #29252f;
+
+            --font-body: 'DM Sans', sans-serif;
+            --font-display: 'Playfair Display', serif;
+            --font-mono: 'DM Mono', monospace;
         }
 
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 24px;
         }
 
         body {
-            background: #e7e8e9;
-            color: var(--navy);
-            font-family: var(--sans);
-            line-height: 1.6;
-            padding: 32px 18px;
+            margin: 0;
+            padding: 34px 18px;
+            background: #eae5df;
+            color: var(--ink);
+            font-family: var(--font-body);
+            font-size: 14px;
+            line-height: 1.7;
         }
 
         a {
             color: inherit;
             text-decoration: none;
+            overflow-wrap: anywhere;
+        }
+
+        a:hover {
+            color: var(--accent);
         }
 
         img {
@@ -82,784 +167,675 @@
             max-width: 1180px;
             margin: 0 auto;
             background: var(--paper);
-            border: 1px solid #d3d5d7;
-            box-shadow: 0 20px 70px rgba(26, 37, 48, 0.10);
-        }
-
-        .panel {
-            background: var(--white);
-            border: 1px solid var(--line);
-            padding: 32px;
-            min-width: 0;
-        }
-
-        .eyebrow {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--gray);
-            font-family: var(--mono);
-            font-size: 10px;
-            font-weight: 500;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-
-        .eyebrow::before {
-            content: '';
-            width: 7px;
-            height: 7px;
-            flex-shrink: 0;
-            background: var(--burgundy);
-            border-radius: 50%;
-        }
-
-        .section-heading {
-            margin: 13px 0 22px;
-            font-family: var(--sans);
-            font-size: clamp(21px, 2.5vw, 30px);
-            font-weight: 800;
-            letter-spacing: -1.2px;
-            line-height: 1.15;
-            text-transform: uppercase;
-        }
-
-        .section-heading span {
-            color: var(--burgundy);
-        }
-
-        .section-copy {
-            color: #626b73;
-            font-size: 13px;
-            line-height: 1.9;
-            overflow-wrap: anywhere;
+            border: 1px solid #ded5cc;
+            box-shadow: 0 18px 60px rgba(48, 37, 38, 0.09);
+            overflow: hidden;
         }
 
         .topbar {
+            min-height: 68px;
+            padding: 16px 38px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 24px;
-            padding: 20px 32px;
-            background: var(--white);
+            gap: 20px;
             border-bottom: 1px solid var(--line);
         }
 
         .brand {
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            font-family: var(--font-display);
+            font-size: 21px;
+            font-weight: 600;
+            color: var(--accent);
         }
 
-        .brand span {
-            color: var(--burgundy);
+        .brand-mark {
+            display: inline-block;
+            margin-right: 7px;
+            font-size: 13px;
         }
 
-        .topbar-label {
-            color: var(--gray);
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: 1px;
-            text-align: right;
-            text-transform: uppercase;
-        }
-
-        .navigation {
+        .nav {
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
             align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 22px;
         }
 
-        .navigation a {
-            color: var(--navy);
+        .nav a {
+            font-family: var(--font-mono);
             font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.8px;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            transition: color 0.2s ease;
         }
-
-        .navigation a:hover {
-            color: var(--burgundy);
-        }
-
-        /* HERO */
 
         .hero {
             display: grid;
-            grid-template-columns: 0.85fr 1.5fr 0.85fr;
-            gap: 24px;
+            grid-template-columns: 0.8fr 1.5fr 0.8fr;
             align-items: center;
-            min-height: 420px;
-            padding: 44px 36px;
-            background: var(--white);
+            gap: 32px;
+            padding: 66px 46px 58px;
             border-bottom: 1px solid var(--line);
         }
 
-        .hero-intro {
-            align-self: stretch;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 24px;
-        }
-
-        .hero-intro .small-label {
-            color: var(--burgundy);
-            font-family: var(--mono);
+        .hero-note {
+            font-family: var(--font-mono);
             font-size: 10px;
             letter-spacing: 1.4px;
             text-transform: uppercase;
+            color: var(--muted);
         }
 
-        .hero-intro h2 {
-            margin: 14px 0;
-            font-family: var(--serif);
-            font-size: 25px;
-            font-weight: 500;
-            line-height: 1.3;
-        }
-
-        .hero-intro p {
-            color: var(--gray);
-            font-size: 12px;
-            line-height: 1.9;
-            overflow-wrap: anywhere;
-        }
-
-        .hero-url {
-            color: var(--navy);
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: 1px;
-            overflow-wrap: anywhere;
-            text-transform: uppercase;
-        }
-
-        .hero-center {
-            position: relative;
-            text-align: center;
-            min-width: 0;
-        }
-
-        .hero-title {
-            position: relative;
-            z-index: 1;
-            font-family: var(--sans);
-            font-size: clamp(36px, 5.5vw, 70px);
-            font-weight: 800;
-            letter-spacing: -4px;
-            line-height: 0.95;
-            overflow-wrap: anywhere;
-            text-transform: uppercase;
-        }
-
-        .hero-title .title-line {
+        .hero-note strong {
             display: block;
-        }
-
-        .hero-title .outline-text {
-            color: transparent;
-            -webkit-text-stroke: 1px var(--navy);
-        }
-
-        .hero-star {
-            position: absolute;
-            top: -25px;
-            right: 8%;
-            color: var(--burgundy);
-            font-size: 42px;
-            line-height: 1;
+            margin-top: 9px;
+            color: var(--accent);
+            font-weight: 500;
         }
 
         .portrait-wrap {
-            position: relative;
-            z-index: 2;
-            width: 210px;
-            height: 220px;
-            margin: 20px auto 0;
-            padding: 8px;
+            width: 100%;
+            max-width: 205px;
+            margin: 0 auto;
+            padding: 10px 10px 24px;
             background: var(--white);
-            border: 1px solid var(--line);
-            box-shadow: 0 8px 25px rgba(26, 37, 48, 0.12);
+            border: 1px solid #e3d9d0;
+            box-shadow: 0 8px 18px rgba(45, 33, 33, 0.1);
             transform: rotate(-3deg);
+            position: relative;
+        }
+
+        .portrait-wrap::before {
+            content: "";
+            position: absolute;
+            width: 65px;
+            height: 18px;
+            left: 50%;
+            top: -9px;
+            transform: translateX(-50%) rotate(2deg);
+            background: rgba(225, 198, 157, 0.7);
+            z-index: 2;
         }
 
         .portrait {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            object-fit: cover;
+            background: var(--paper-dark);
+        }
+
+        .portrait-placeholder {
+            width: 100%;
+            aspect-ratio: 4 / 5;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            height: 100%;
-            background: var(--cream);
-            color: var(--burgundy);
-            font-family: var(--serif);
-            font-size: 48px;
-            overflow: hidden;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-family: var(--font-display);
+            font-size: 72px;
         }
 
-        .portrait img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
+        .portrait-caption {
+            margin-top: 10px;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--muted);
         }
 
-        .hero-script {
-            position: relative;
-            z-index: 3;
-            margin-top: -4px;
-            color: var(--burgundy);
-            font-family: var(--script);
-            font-size: clamp(34px, 4vw, 48px);
-            line-height: 1.1;
-            transform: rotate(-5deg);
+        .hero-center {
+            text-align: center;
         }
 
-        .hero-right {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-self: stretch;
-            gap: 28px;
-        }
-
-        .hero-right .availability {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray);
-            font-size: 11px;
-        }
-
-        .availability::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: #5c9272;
-            border-radius: 50%;
-        }
-
-        .hero-note {
-            padding: 17px;
-            background: var(--burgundy-light);
-            border: 1px solid #ead2da;
-        }
-
-        .hero-note .note-title {
-            margin-bottom: 8px;
-            color: var(--burgundy);
-            font-family: var(--mono);
+        .eyebrow {
+            margin: 0 0 14px;
+            color: var(--accent);
+            font-family: var(--font-mono);
             font-size: 10px;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
-        .hero-note p {
-            color: #65535a;
-            font-size: 12px;
-            line-height: 1.8;
+        h1, h2, h3, p {
+            margin-top: 0;
+        }
+
+        .hero h1 {
+            margin-bottom: 15px;
+            font-family: var(--font-display);
+            font-size: clamp(34px, 5vw, 61px);
+            line-height: 1.13;
+            font-weight: 500;
             overflow-wrap: anywhere;
         }
 
-        .social-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 14px;
+        .hero-description {
+            max-width: 440px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 14px;
         }
 
-        .social-links a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 34px;
-            min-height: 34px;
-            padding: 7px 10px;
-            border: 1px solid var(--line);
-            color: var(--navy);
-            font-family: var(--mono);
+        .hero-side {
+            padding-left: 22px;
+            border-left: 1px solid var(--line);
+        }
+
+        .side-label {
+            margin-bottom: 6px;
+            font-family: var(--font-mono);
             font-size: 9px;
-            transition: background 0.2s, color 0.2s;
+            letter-spacing: 1px;
+            color: var(--muted);
+            text-transform: uppercase;
         }
 
-        .social-links a:hover {
-            background: var(--navy);
-            color: var(--white);
+        .side-value {
+            margin-bottom: 20px;
+            font-size: 12px;
+            overflow-wrap: anywhere;
         }
 
-        /* MAIN GRID */
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 20px;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+        }
+
+        .section-label::after {
+            content: "";
+            height: 1px;
+            flex: 1;
+            background: var(--line);
+        }
 
         .content-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0;
+            border-bottom: 1px solid var(--line);
         }
 
-        .content-grid > .panel {
-            border-top: 0;
+        .panel {
+            min-width: 0;
+            padding: 38px 40px;
         }
 
-        .content-grid > .panel:nth-child(odd) {
-            border-right: 0;
+        .about-panel,
+        .skills-panel {
+            border-bottom: 1px solid var(--line);
         }
 
-        .about-layout {
-            display: grid;
-            grid-template-columns: 1fr 0.8fr;
-            gap: 20px;
+        .about-panel,
+        .education-panel {
+            border-right: 1px solid var(--line);
         }
 
-        .about-text {
-            color: #626b73;
-            font-size: 13px;
-            line-height: 1.9;
+        .section-heading {
+            margin-bottom: 15px;
+            font-family: var(--font-display);
+            font-size: 27px;
+            line-height: 1.3;
+            font-weight: 500;
+        }
+
+        .body-copy {
+            color: #625a60;
+            white-space: pre-line;
             overflow-wrap: anywhere;
         }
 
-        .about-visual {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 150px;
-            padding: 16px;
-            background: var(--cream);
-            border: 1px solid var(--line);
-            text-align: center;
+        .empty-note {
+            color: var(--muted);
+            font-size: 12px;
+            font-style: italic;
         }
 
-        .about-visual .big-initials {
-            color: var(--burgundy);
-            font-family: var(--serif);
-            font-size: 52px;
-            line-height: 1.1;
-        }
-
-        .about-visual .visual-caption {
-            margin-top: 8px;
-            color: var(--gray);
-            font-family: var(--mono);
-            font-size: 9px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* SKILLS */
-
-        .skills-list {
+        .skill-list {
             display: flex;
             flex-wrap: wrap;
             gap: 9px;
         }
 
         .skill-tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 12px;
-            background: var(--paper);
-            border: 1px solid var(--line);
-            color: var(--navy);
+            padding: 7px 12px;
+            border: 1px solid var(--accent-medium);
+            background: var(--accent-soft);
+            color: var(--accent-dark);
             font-size: 11px;
-            font-weight: 600;
-            overflow-wrap: anywhere;
+            border-radius: 2px;
         }
 
-        .skill-tag:nth-child(3n + 2) {
-            background: var(--burgundy-light);
-            border-color: #ead2da;
-            color: var(--burgundy);
+        .entry {
+            padding: 0 0 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed var(--line);
         }
 
-        .empty-note {
-            color: #92969b;
-            font-size: 12px;
-            font-style: italic;
+        .entry:last-child {
+            padding-bottom: 0;
+            margin-bottom: 0;
+            border-bottom: 0;
         }
 
-        /* EDUCATION AND EXPERIENCE */
-
-        .text-card {
-            padding: 19px;
-            background: var(--paper);
-            border: 1px solid var(--line);
-        }
-
-        .text-card + .text-card {
-            margin-top: 12px;
-        }
-
-        .text-card p {
-            color: #626b73;
-            font-size: 12px;
-            line-height: 1.9;
-            overflow-wrap: anywhere;
-            white-space: normal;
-        }
-
-        .text-card .card-index {
-            display: block;
-            margin-bottom: 10px;
-            color: var(--burgundy);
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .text-card .card-title {
-            margin-bottom: 9px;
-            color: var(--navy);
+        .entry-title {
+            margin-bottom: 4px;
             font-size: 14px;
-            font-weight: 800;
+            font-weight: 700;
+            overflow-wrap: anywhere;
         }
 
-        /* PROJECTS */
+        .entry-meta {
+            margin-bottom: 8px;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .entry-description {
+            margin-bottom: 0;
+            color: #71666d;
+            font-size: 12px;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
 
         .projects-panel {
-            grid-column: 1 / -1;
-            border-right: 1px solid var(--line) !important;
+            padding: 42px 40px;
+            border-bottom: 1px solid var(--line);
         }
 
-        .projects-heading-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            gap: 20px;
-        }
-
-        .projects-heading-row .section-heading {
-            margin-bottom: 0;
-        }
-
-        .project-count {
-            color: var(--gray);
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: 1px;
-            white-space: nowrap;
-        }
-
-        .projects-intro {
-            max-width: 550px;
-            margin-top: 14px;
-            color: var(--gray);
-            font-size: 12px;
-            line-height: 1.8;
-        }
-
-        .project-grid {
+        .projects-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
-            margin-top: 25px;
+            gap: 18px;
         }
 
         .project-card {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            min-height: 175px;
-            padding: 20px;
-            background: var(--paper);
+            min-width: 0;
+            padding: 22px;
+            background: var(--white);
             border: 1px solid var(--line);
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            transition: border-color 0.2s ease, transform 0.2s ease;
         }
 
         .project-card:hover {
+            border-color: var(--accent-medium);
             transform: translateY(-3px);
-            border-color: var(--burgundy);
         }
 
         .project-number {
-            color: var(--burgundy);
-            font-family: var(--mono);
+            margin-bottom: 16px;
+            color: var(--accent);
+            font-family: var(--font-mono);
             font-size: 10px;
-            letter-spacing: 1px;
         }
 
-        .project-symbol {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 42px;
-            height: 42px;
-            margin: 18px 0;
-            background: var(--burgundy-light);
-            color: var(--burgundy);
-            font-family: var(--serif);
-            font-size: 25px;
-        }
-
-        .project-card p {
-            color: #626b73;
-            font-size: 12px;
-            line-height: 1.8;
+        .project-title {
+            margin-bottom: 10px;
+            font-family: var(--font-display);
+            font-size: 21px;
+            font-weight: 500;
+            line-height: 1.35;
             overflow-wrap: anywhere;
-            white-space: normal;
         }
 
-        /* CONTACT */
+        .project-description {
+            margin-bottom: 14px;
+            color: #71666d;
+            font-size: 12px;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
 
-        .contact-panel {
+        .project-link {
+            display: inline-block;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .additional-panel {
+            padding: 38px 40px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .additional-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .additional-item {
+            padding: 15px;
+            background: var(--accent-soft);
+            border-left: 2px solid var(--accent);
+            overflow-wrap: anywhere;
+        }
+
+        .contact {
+            padding: 48px 40px;
+            background: var(--dark);
+            color: #f8f2ed;
+        }
+
+        .contact .section-label {
+            color: #e2bdce;
+        }
+
+        .contact .section-label::after {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-inner {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 28px;
-            align-items: center;
-            background: var(--navy);
-            color: var(--white);
-            border-top: 0;
+            gap: 35px;
+            align-items: start;
         }
 
-        .contact-panel .eyebrow {
-            color: #c3c9ce;
-        }
-
-        .contact-panel .section-heading {
+        .contact h2 {
             margin-bottom: 12px;
-            color: var(--white);
+            font-family: var(--font-display);
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 500;
+            line-height: 1.2;
         }
 
-        .contact-panel .section-heading span {
-            color: #d88ca3;
+        .contact-copy {
+            max-width: 420px;
+            color: #c7bdc6;
+            font-size: 12px;
         }
 
-        .contact-panel .section-copy {
-            color: #c3c9ce;
-        }
-
-        .contact-details {
+        .contact-list {
             display: grid;
             gap: 12px;
         }
 
         .contact-item {
-            padding: 13px 15px;
-            border: 1px solid #44505b;
+            padding-bottom: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            overflow-wrap: anywhere;
         }
 
-        .contact-item .contact-label {
+        .contact-label {
             display: block;
             margin-bottom: 4px;
-            color: #d88ca3;
-            font-family: var(--mono);
+            color: #c9a7ba;
+            font-family: var(--font-mono);
             font-size: 9px;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
         }
 
         .contact-item a,
-        .contact-item p {
-            color: var(--white);
+        .contact-item span {
             font-size: 12px;
-            overflow-wrap: anywhere;
         }
 
-        .contact-item a:hover {
-            color: #e8a9bc;
+        .contact a:hover {
+            color: #e7c5d6;
         }
 
         .footer {
+            padding: 18px 38px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            padding: 19px 32px;
-            background: var(--paper);
-            border-top: 1px solid var(--line);
-        }
-
-        .footer p {
-            color: var(--gray);
-            font-family: var(--mono);
+            gap: 15px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-family: var(--font-mono);
             font-size: 9px;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
+            letter-spacing: 0.6px;
         }
 
-        .footer .footer-brand {
-            color: var(--navy);
+        .footer strong {
+            color: var(--accent);
             font-weight: 500;
         }
 
-        /* RESPONSIVE */
-
-        @media (max-width: 900px) {
-            body {
-                padding: 18px 12px;
-            }
-
-            .hero {
-                grid-template-columns: 0.8fr 1.3fr;
-                gap: 25px;
-                padding: 32px 25px;
-            }
-
-            .hero-center {
-                grid-column: 2;
-                grid-row: 1 / span 2;
-            }
-
-            .hero-right {
-                grid-column: 1;
-                grid-row: 2;
-            }
-
-            .hero-intro {
-                grid-column: 1;
-                grid-row: 1;
-            }
-
-            .hero-title {
-                font-size: clamp(36px, 6vw, 58px);
-            }
-
-            .portrait-wrap {
-                width: min(190px, 90%);
-                height: 205px;
-            }
-
-            .panel {
-                padding: 25px;
-            }
-
-            .project-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+        /*
+        |--------------------------------------------------------------------------
+        | Cards layout
+        |--------------------------------------------------------------------------
+        */
+        .layout-cards .content-grid {
+            gap: 16px;
+            padding: 18px;
+            border-bottom: 1px solid var(--line);
         }
 
-        @media (max-width: 620px) {
-            body {
-                padding: 0;
-                background: var(--paper);
-            }
+        .layout-cards .panel {
+            padding: 28px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--white);
+        }
 
-            .portfolio {
-                border: 0;
-                box-shadow: none;
+        .layout-cards .projects-panel {
+            padding: 34px;
+        }
+
+        .layout-cards .project-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(45, 33, 33, 0.035);
+        }
+
+        .layout-cards .additional-item {
+            border-radius: 8px;
+        }
+
+        .layout-cards .hero {
+            background: var(--white);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Editorial layout
+        |--------------------------------------------------------------------------
+        */
+        .layout-editorial .hero {
+            grid-template-columns: 0.7fr 1.7fr 0.6fr;
+            padding-top: 78px;
+            padding-bottom: 78px;
+        }
+
+        .layout-editorial .hero-center {
+            text-align: left;
+        }
+
+        .layout-editorial .hero-description {
+            margin-left: 0;
+        }
+
+        .layout-editorial .hero h1,
+        .layout-editorial .section-heading,
+        .layout-editorial .project-title {
+            font-family: var(--font-display);
+        }
+
+        .layout-editorial .content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .layout-editorial .panel {
+            border-right: 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .layout-editorial .projects-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .layout-editorial .project-card {
+            display: grid;
+            grid-template-columns: 55px 1fr;
+            column-gap: 15px;
+            align-items: start;
+        }
+
+        .layout-editorial .project-number {
+            grid-row: 1 / span 3;
+        }
+
+        .layout-editorial .project-title {
+            margin-bottom: 8px;
+        }
+
+        .layout-editorial .project-description {
+            margin-bottom: 10px;
+        }
+
+        .layout-editorial .additional-list {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: 850px) {
+            body {
+                padding: 16px 10px;
             }
 
             .topbar {
+                padding: 18px 24px;
                 align-items: flex-start;
                 flex-direction: column;
-                padding: 19px 20px;
-                gap: 17px;
             }
 
-            .topbar-label {
-                text-align: left;
+            .nav {
+                justify-content: flex-start;
+                gap: 15px;
             }
 
-            .navigation {
-                gap: 13px;
-            }
-
-            .navigation a {
-                font-size: 9px;
-            }
-
-            .hero {
+            .hero,
+            .layout-editorial .hero {
                 grid-template-columns: 1fr;
                 gap: 28px;
-                padding: 35px 20px;
-            }
-
-            .hero-intro,
-            .hero-center,
-            .hero-right {
-                grid-column: 1;
-                grid-row: auto;
-            }
-
-            .hero-intro {
-                gap: 12px;
-            }
-
-            .hero-intro h2 {
-                margin: 7px 0;
-            }
-
-            .hero-center {
-                padding: 20px 0;
-            }
-
-            .hero-title {
-                font-size: clamp(40px, 12vw, 62px);
-                letter-spacing: -2.5px;
-            }
-
-            .hero-star {
-                top: -5px;
-                right: 5%;
+                padding: 42px 26px;
+                text-align: center;
             }
 
             .portrait-wrap {
-                width: 195px;
-                height: 205px;
-                margin-top: 25px;
+                max-width: 180px;
             }
 
-            .hero-right {
-                gap: 18px;
+            .hero-center,
+            .layout-editorial .hero-center {
+                text-align: center;
+            }
+
+            .hero-description,
+            .layout-editorial .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-side {
+                padding: 22px 0 0;
+                border-left: 0;
+                border-top: 1px solid var(--line);
+            }
+
+            .side-value {
+                margin-bottom: 12px;
             }
 
             .content-grid {
                 grid-template-columns: 1fr;
             }
 
-            .content-grid > .panel,
-            .content-grid > .panel:nth-child(odd),
-            .projects-panel {
-                grid-column: auto;
-                border-right: 1px solid var(--line) !important;
-                border-left: 1px solid var(--line);
+            .panel,
+            .layout-cards .panel {
+                padding: 28px 24px;
             }
 
-            .panel {
-                padding: 25px 20px;
+            .about-panel,
+            .education-panel {
+                border-right: 0;
             }
 
-            .about-layout {
-                grid-template-columns: 1fr;
+            .projects-panel,
+            .additional-panel,
+            .contact {
+                padding: 32px 24px;
             }
 
-            .about-visual {
-                min-height: 130px;
+            .projects-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .project-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .project-card {
-                min-height: 145px;
-            }
-
-            .projects-heading-row {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .contact-panel {
+            .contact-inner {
                 grid-template-columns: 1fr;
                 gap: 24px;
             }
 
+            .layout-cards .content-grid {
+                padding: 12px;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 0;
+            }
+
+            .portfolio {
+                border-left: 0;
+                border-right: 0;
+            }
+
+            .topbar {
+                padding: 18px;
+            }
+
+            .nav {
+                gap: 12px;
+            }
+
+            .nav a {
+                font-size: 9px;
+            }
+
+            .hero {
+                padding: 36px 20px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .projects-grid,
+            .additional-list {
+                grid-template-columns: 1fr;
+            }
+
+            .layout-editorial .project-card {
+                grid-template-columns: 38px 1fr;
+                padding: 16px;
+            }
+
             .footer {
-                align-items: flex-start;
+                padding: 18px 20px;
                 flex-direction: column;
-                padding: 19px 20px;
-                gap: 8px;
             }
         }
 
         @media print {
             body {
                 padding: 0;
-                background: var(--white);
+                background: white;
             }
 
             .portfolio {
@@ -868,27 +844,27 @@
                 box-shadow: none;
             }
 
-            .navigation a {
-                color: var(--navy);
+            .project-card {
+                break-inside: avoid;
             }
 
-            .project-card:hover {
-                transform: none;
+            a {
+                text-decoration: none;
             }
         }
     </style>
 </head>
 
 <body>
-    <main class="portfolio">
+    <main class="portfolio layout-{{ $layout }}">
 
-        {{-- TOP NAVIGATION --}}
+        {{-- Navigation --}}
         <header class="topbar">
-            <a href="{{ route('home') }}" class="brand">
-                PORTFOLIO<span>.</span>
+            <a href="#home" class="brand">
+                <span class="brand-mark">✳</span>{{ $fullName }}
             </a>
 
-            <nav class="navigation" aria-label="Main navigation">
+            <nav class="nav" aria-label="Main navigation">
                 <a href="#about">About</a>
                 <a href="#skills">Skills</a>
                 <a href="#education">Education</a>
@@ -898,397 +874,377 @@
             </nav>
         </header>
 
-        {{-- HERO SECTION --}}
+        {{-- Hero --}}
         <section class="hero" id="home">
-
-            <div class="hero-intro">
-                <div>
-                    <span class="small-label">Personal Portfolio / 01</span>
-
-                    <h2>
-                        A little about
-                        <span style="color: var(--burgundy);">me.</span>
-                    </h2>
-
-                    <p>
-                        {{ \Illuminate\Support\Str::limit(strip_tags($portfolio->about_me ?? 'Welcome to my personal portfolio.'), 190) }}
-                    </p>
-                </div>
-
-                <div>
-                    @if(!empty($websiteUrl))
-                        <a
-                            href="{{ \Illuminate\Support\Str::startsWith($websiteUrl, ['http://', 'https://']) ? $websiteUrl : 'https://' . $websiteUrl }}"
-                            class="hero-url"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {{ $websiteUrl }}
-                        </a>
-                    @else
-                        <span class="hero-url">MY CREATIVE SPACE</span>
-                    @endif
-                </div>
+            <div class="hero-note">
+                Personal portfolio
+                <strong>Selected works &amp; experiences</strong>
             </div>
 
             <div class="hero-center">
-                <span class="hero-star" aria-hidden="true">*</span>
-
-                <h1 class="hero-title">
-                    <span class="title-line">MY</span>
-                    <span class="title-line outline-text">PORTFOLIO</span>
-                </h1>
-
                 <div class="portrait-wrap">
-                    <div class="portrait">
-                        @if($imageUrl)
-                            <img
-                                src="{{ $imageUrl }}"
-                                alt="Profile picture of {{ $portfolio->full_name }}"
-                            >
-                        @else
-                            {{ $initials ?: 'ME' }}
-                        @endif
-                    </div>
+                    @if ($profilePicture)
+                        <img
+                            class="portrait"
+                            src="{{ \Illuminate\Support\Facades\Storage::url($profilePicture) }}"
+                            alt="{{ $fullName }}'s profile picture"
+                        >
+                    @else
+                        <div class="portrait-placeholder">
+                            {{ strtoupper(substr($fullName, 0, 1)) }}
+                        </div>
+                    @endif
+
+                    <div class="portrait-caption">a little about me</div>
                 </div>
 
-                <p class="hero-script">
-                    Hello, I'm {{ $portfolio->full_name }}
+                <p class="eyebrow">Hello, and welcome</p>
+
+                <h1>{{ $fullName }}</h1>
+
+                <p class="hero-description">
+                    {{ $aboutMe ?: 'A little space to introduce myself, share my experiences, and showcase the things I create.' }}
                 </p>
             </div>
 
-            <div class="hero-right">
-                <div>
-                    <p class="eyebrow">A little introduction</p>
+            <div class="hero-side">
+                <p class="side-label">Based in</p>
+                <p class="side-value">{{ $address ?: 'Location not specified' }}</p>
 
-                    <div class="hero-note" style="margin-top: 15px;">
-                        <p class="note-title">Welcome to my portfolio</p>
-                        <p>
-                            Discover my background, skills, education,
-                            experiences, and the projects that represent
-                            my learning and growth.
-                        </p>
-                    </div>
-                </div>
+                <p class="side-label">Currently exploring</p>
+                <p class="side-value">Ideas, creativity, and new opportunities.</p>
 
-                <div>
-                    <p class="availability">Thanks for stopping by</p>
-
-                    <div class="social-links">
-                        @if(!empty($portfolio->email))
-                            <a href="mailto:{{ $portfolio->email }}" aria-label="Email">MAIL</a>
-                        @endif
-
-                        @if(!empty($linkedinUrl))
-                            <a
-                                href="{{ \Illuminate\Support\Str::startsWith($linkedinUrl, ['http://', 'https://']) ? $linkedinUrl : 'https://' . $linkedinUrl }}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label="LinkedIn"
-                            >IN</a>
-                        @endif
-
-                        @if(!empty($githubUrl))
-                            <a
-                                href="{{ \Illuminate\Support\Str::startsWith($githubUrl, ['http://', 'https://']) ? $githubUrl : 'https://' . $githubUrl }}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label="GitHub"
-                            >GH</a>
-                        @endif
-
-                        @if(!empty($websiteUrl))
-                            <a
-                                href="{{ \Illuminate\Support\Str::startsWith($websiteUrl, ['http://', 'https://']) ? $websiteUrl : 'https://' . $websiteUrl }}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label="Website"
-                            >WEB</a>
-                        @endif
-                    </div>
-                </div>
+                @if ($email)
+                    <p class="side-label">Say hello</p>
+                    <p class="side-value">
+                        <a href="mailto:{{ $email }}">{{ $email }}</a>
+                    </p>
+                @endif
             </div>
-
         </section>
 
-        {{-- ABOUT AND SKILLS --}}
+        {{-- About and Skills --}}
         <div class="content-grid">
+            <section class="panel about-panel" id="about">
+                <p class="section-label">01 / About me</p>
+                <h2 class="section-heading">The person behind the work.</h2>
 
-            <section class="panel" id="about">
-                <p class="eyebrow">01 / Introduction</p>
+                @if ($aboutMe)
+                    <p class="body-copy">{{ $aboutMe }}</p>
+                @else
+                    <p class="empty-note">
+                        No introduction has been added yet.
+                    </p>
+                @endif
+            </section>
 
-                <h2 class="section-heading">
-                    WHO AM <span>I?</span>
-                </h2>
+            <section class="panel skills-panel" id="skills">
+                <p class="section-label">02 / Skills</p>
+                <h2 class="section-heading">Things I work with.</h2>
 
-                <div class="about-layout">
-                    <div class="about-text">
-                        @if(!empty($portfolio->about_me))
-                            {!! nl2br(e($portfolio->about_me)) !!}
-                        @else
-                            <p class="empty-note">
-                                No introduction has been added yet.
+                @if (count($skills))
+                    <div class="skill-list">
+                        @foreach ($skills as $skill)
+                            @php
+                                $skillName = $getValue(
+                                    $skill,
+                                    ['name', 'skill', 'title'],
+                                    ''
+                                );
+                            @endphp
+
+                            @if (trim((string) $skillName) !== '')
+                                <span class="skill-tag">{{ $skillName }}</span>
+                            @endif
+                        @endforeach
+                    </div>
+                @else
+                    <p class="empty-note">No skills have been added yet.</p>
+                @endif
+            </section>
+
+            {{-- Education --}}
+            <section class="panel education-panel" id="education">
+                <p class="section-label">03 / Education</p>
+                <h2 class="section-heading">What I've learned.</h2>
+
+                @forelse ($education as $item)
+                    @php
+                        $school = $getValue(
+                            $item,
+                            ['school', 'institution', 'name', 'title'],
+                            'Educational background'
+                        );
+
+                        $degree = $getValue(
+                            $item,
+                            ['degree', 'course', 'program', 'qualification'],
+                            ''
+                        );
+
+                        $educationDate = $getValue(
+                            $item,
+                            ['year', 'date', 'duration', 'period'],
+                            ''
+                        );
+
+                        $educationDescription = $getValue(
+                            $item,
+                            ['description', 'details'],
+                            ''
+                        );
+                    @endphp
+
+                    <article class="entry">
+                        <h3 class="entry-title">{{ $school }}</h3>
+
+                        @if ($degree || $educationDate)
+                            <p class="entry-meta">
+                                {{ $degree }}
+                                @if ($degree && $educationDate) · @endif
+                                {{ $educationDate }}
                             </p>
                         @endif
-                    </div>
 
-                    <div class="about-visual">
-                        @if($imageUrl)
-                            <img
-                                src="{{ $imageUrl }}"
-                                alt="{{ $portfolio->full_name }}"
-                                style="width: 100%; max-height: 190px; object-fit: cover;"
-                            >
-                        @else
-                            <span class="big-initials">{{ $initials ?: 'ME' }}</span>
-                            <span class="visual-caption">A work in progress</span>
+                        @if ($educationDescription)
+                            <p class="entry-description">{{ $educationDescription }}</p>
                         @endif
-                    </div>
-                </div>
+                    </article>
+                @empty
+                    <p class="empty-note">No educational background has been added yet.</p>
+                @endforelse
             </section>
 
-            <section class="panel" id="skills">
-                <p class="eyebrow">02 / What I know</p>
+            {{-- Experience --}}
+            <section class="panel experience-panel" id="experience">
+                <p class="section-label">04 / Experience</p>
+                <h2 class="section-heading">Where I've grown.</h2>
 
-                <h2 class="section-heading">
-                    MY <span>SKILLS</span>
-                </h2>
+                @forelse ($experience as $item)
+                    @php
+                        $jobTitle = $getValue(
+                            $item,
+                            ['position', 'job_title', 'title', 'role'],
+                            'Experience'
+                        );
 
-                <p class="section-copy" style="margin-bottom: 22px;">
-                    A collection of skills and abilities that I continue
-                    to develop through learning and experience.
-                </p>
+                        $company = $getValue(
+                            $item,
+                            ['company', 'organization', 'employer'],
+                            ''
+                        );
 
-                @if(count($skills))
-                    <div class="skills-list">
-                        @foreach($skills as $skill)
-                            <span class="skill-tag">
-                                {{ $skill }}
-                            </span>
-                        @endforeach
-                    </div>
-                @else
-                    <p class="empty-note">
-                        No skills have been added yet.
-                    </p>
-                @endif
+                        $experienceDate = $getValue(
+                            $item,
+                            ['duration', 'date', 'period', 'year'],
+                            ''
+                        );
 
-                <div style="margin-top: 27px; padding-top: 18px; border-top: 1px solid var(--line);">
-                    <span class="eyebrow">Always learning</span>
+                        $experienceDescription = $getValue(
+                            $item,
+                            ['description', 'responsibilities', 'details'],
+                            ''
+                        );
+                    @endphp
 
-                    <p class="section-copy" style="margin-top: 10px;">
-                        Every new skill is another opportunity to grow,
-                        explore ideas, and improve my work.
-                    </p>
-                </div>
+                    <article class="entry">
+                        <h3 class="entry-title">{{ $jobTitle }}</h3>
+
+                        @if ($company || $experienceDate)
+                            <p class="entry-meta">
+                                {{ $company }}
+                                @if ($company && $experienceDate) · @endif
+                                {{ $experienceDate }}
+                            </p>
+                        @endif
+
+                        @if ($experienceDescription)
+                            <p class="entry-description">{{ $experienceDescription }}</p>
+                        @endif
+                    </article>
+                @empty
+                    <p class="empty-note">No experience has been added yet.</p>
+                @endforelse
             </section>
-
-            {{-- EDUCATION --}}
-            <section class="panel" id="education">
-                <p class="eyebrow">03 / Learning journey</p>
-
-                <h2 class="section-heading">
-                    MY <span>EDUCATION</span>
-                </h2>
-
-                @if(!empty($portfolio->educational_background))
-                    <div class="text-card">
-                        <span class="card-index">Education / Background</span>
-
-                        <p>{!! nl2br(e($portfolio->educational_background)) !!}</p>
-                    </div>
-                @else
-                    <p class="empty-note">
-                        No educational background has been added yet.
-                    </p>
-                @endif
-            </section>
-
-            {{-- EXPERIENCE --}}
-            <section class="panel" id="experience">
-                <p class="eyebrow">04 / Practical experience</p>
-
-                <h2 class="section-heading">
-                    MY <span>EXPERIENCE</span>
-                </h2>
-
-                @if(!empty($portfolio->work_experience))
-                    <div class="text-card">
-                        <span class="card-index">Experience / Background</span>
-
-                        <p>{!! nl2br(e($portfolio->work_experience)) !!}</p>
-                    </div>
-                @else
-                    <p class="empty-note">
-                        No work experience has been added yet.
-                    </p>
-                @endif
-            </section>
-
-            {{-- PROJECTS --}}
-            <section class="panel projects-panel" id="projects">
-                <p class="eyebrow">05 / Selected work</p>
-
-                <div class="projects-heading-row">
-                    <h2 class="section-heading">
-                        THINGS I'VE <span>CREATED.</span>
-                    </h2>
-
-                    <span class="project-count">MY PROJECTS</span>
-                </div>
-
-                <p class="projects-intro">
-                    A look at my projects, ideas, and work. Each one represents
-                    a chance to apply what I have learned and develop new skills.
-                </p>
-
-                @if(!empty($portfolio->projects))
-                    <div class="project-grid">
-                        @php
-                            $projectItems = preg_split('/\n\s*\n/', trim($portfolio->projects));
-                            $projectItems = array_filter(array_map('trim', $projectItems));
-                        @endphp
-
-                        @foreach($projectItems as $index => $project)
-                            <article class="project-card">
-                                <span class="project-number">
-                                    PROJECT / {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
-                                </span>
-
-                                <span class="project-symbol" aria-hidden="true">
-                                    {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
-                                </span>
-
-                                <p>{!! nl2br(e($project)) !!}</p>
-                            </article>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-card" style="margin-top: 24px;">
-                        <p class="empty-note">
-                            No projects have been added yet.
-                        </p>
-                    </div>
-                @endif
-            </section>
-
-            {{-- ADDITIONAL INFORMATION --}}
-            @if(!empty($portfolio->additional_info))
-                <section class="panel" style="grid-column: 1 / -1;" id="additional">
-                    <p class="eyebrow">06 / A few more details</p>
-
-                    <h2 class="section-heading">
-                        BEYOND THE <span>PORTFOLIO.</span>
-                    </h2>
-
-                    <div class="text-card">
-                        <p>{!! nl2br(e($portfolio->additional_info)) !!}</p>
-                    </div>
-                </section>
-            @endif
-
         </div>
 
-        {{-- CONTACT --}}
-        <section class="panel contact-panel" id="contact">
-            <div>
-                <p class="eyebrow">Let's connect</p>
+        {{-- Projects --}}
+        <section class="projects-panel" id="projects">
+            <p class="section-label">05 / Selected projects</p>
+            <h2 class="section-heading">A few things I've created.</h2>
 
-                <h2 class="section-heading">
-                    HAVE SOMETHING <span>IN MIND?</span>
-                </h2>
+            @if (count($projects))
+                <div class="projects-grid">
+                    @foreach ($projects as $index => $project)
+                        @php
+                            $projectTitle = $getValue(
+                                $project,
+                                ['title', 'name', 'project_name'],
+                                'Untitled project'
+                            );
 
-                <p class="section-copy">
-                    Thank you for taking the time to explore my portfolio.
-                    Feel free to reach out through the contact information
-                    provided here.
-                </p>
-            </div>
+                            $projectDescription = $getValue(
+                                $project,
+                                ['description', 'details', 'about'],
+                                ''
+                            );
 
-            <div class="contact-details">
-                @if(!empty($portfolio->email))
-                    <div class="contact-item">
-                        <span class="contact-label">Email</span>
-                        <a href="mailto:{{ $portfolio->email }}">
-                            {{ $portfolio->email }}
-                        </a>
-                    </div>
-                @endif
+                            $projectLink = $getValue(
+                                $project,
+                                ['url', 'link', 'project_url'],
+                                ''
+                            );
+                        @endphp
 
-                @if(!empty($portfolio->address))
-                    <div class="contact-item">
-                        <span class="contact-label">Location</span>
-                        <p>{{ $portfolio->address }}</p>
-                    </div>
-                @endif
+                        <article class="project-card">
+                            <p class="project-number">
+                                PROJECT / {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                            </p>
 
-                @if(!empty($websiteUrl))
-                    <div class="contact-item">
-                        <span class="contact-label">Website</span>
-                        <a
-                            href="{{ \Illuminate\Support\Str::startsWith($websiteUrl, ['http://', 'https://']) ? $websiteUrl : 'https://' . $websiteUrl }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {{ $websiteUrl }}
-                        </a>
-                    </div>
-                @endif
+                            <h3 class="project-title">{{ $projectTitle }}</h3>
 
-                @if(!empty($linkedinUrl))
-                    <div class="contact-item">
-                        <span class="contact-label">LinkedIn</span>
-                        <a
-                            href="{{ \Illuminate\Support\Str::startsWith($linkedinUrl, ['http://', 'https://']) ? $linkedinUrl : 'https://' . $linkedinUrl }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {{ $linkedinUrl }}
-                        </a>
-                    </div>
-                @endif
+                            @if ($projectDescription)
+                                <p class="project-description">{{ $projectDescription }}</p>
+                            @endif
 
-                @if(!empty($githubUrl))
-                    <div class="contact-item">
-                        <span class="contact-label">GitHub</span>
-                        <a
-                            href="{{ \Illuminate\Support\Str::startsWith($githubUrl, ['http://', 'https://']) ? $githubUrl : 'https://' . $githubUrl }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {{ $githubUrl }}
-                        </a>
-                    </div>
-                @endif
+                            @if (filter_var($projectLink, FILTER_VALIDATE_URL))
+                                <a
+                                    class="project-link"
+                                    href="{{ $projectLink }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    View project ↗
+                                </a>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            @else
+                <p class="empty-note">No projects have been added yet.</p>
+            @endif
+        </section>
 
-                @if(
-                    empty($portfolio->email) &&
-                    empty($portfolio->address) &&
-                    empty($websiteUrl) &&
-                    empty($linkedinUrl) &&
-                    empty($githubUrl)
-                )
-                    <div class="contact-item">
-                        <span class="contact-label">Contact information</span>
-                        <p>Contact details have not been added yet.</p>
-                    </div>
-                @endif
+        {{-- Additional information --}}
+        @if (count($additionalInfo))
+            <section class="additional-panel">
+                <p class="section-label">06 / More about me</p>
+                <h2 class="section-heading">A few more details.</h2>
+
+                <div class="additional-list">
+                    @foreach ($additionalInfo as $item)
+                        @php
+                            $additionalTitle = $getValue(
+                                $item,
+                                ['title', 'name', 'label'],
+                                ''
+                            );
+
+                            $additionalDescription = $getValue(
+                                $item,
+                                ['description', 'details', 'value'],
+                                ''
+                            );
+                        @endphp
+
+                        <div class="additional-item">
+                            @if ($additionalTitle)
+                                <strong>{{ $additionalTitle }}</strong>
+                            @endif
+
+                            @if ($additionalDescription)
+                                <p style="margin: 6px 0 0;">
+                                    {{ $additionalDescription }}
+                                </p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        {{-- Contact --}}
+        <section class="contact" id="contact">
+            <p class="section-label">07 / Get in touch</p>
+
+            <div class="contact-inner">
+                <div>
+                    <h2>Let's make something meaningful.</h2>
+
+                    <p class="contact-copy">
+                        Thank you for taking the time to explore my portfolio.
+                        Feel free to reach out if you'd like to connect,
+                        collaborate, or learn more about my work.
+                    </p>
+                </div>
+
+                <div class="contact-list">
+                    @if ($email)
+                        <div class="contact-item">
+                            <span class="contact-label">Email</span>
+                            <a href="mailto:{{ $email }}">{{ $email }}</a>
+                        </div>
+                    @endif
+
+                    @if ($website)
+                        <div class="contact-item">
+                            <span class="contact-label">Website</span>
+                            <a
+                                href="{{ \Illuminate\Support\Str::startsWith($website, ['http://', 'https://']) ? $website : 'https://' . $website }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {{ $website }}
+                            </a>
+                        </div>
+                    @endif
+
+                    @if ($linkedin)
+                        <div class="contact-item">
+                            <span class="contact-label">LinkedIn</span>
+                            <a
+                                href="{{ \Illuminate\Support\Str::startsWith($linkedin, ['http://', 'https://']) ? $linkedin : 'https://' . $linkedin }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {{ $linkedin }}
+                            </a>
+                        </div>
+                    @endif
+
+                    @if ($github)
+                        <div class="contact-item">
+                            <span class="contact-label">GitHub</span>
+                            <a
+                                href="{{ \Illuminate\Support\Str::startsWith($github, ['http://', 'https://']) ? $github : 'https://' . $github }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {{ $github }}
+                            </a>
+                        </div>
+                    @endif
+
+                    @if ($address)
+                        <div class="contact-item">
+                            <span class="contact-label">Location</span>
+                            <span>{{ $address }}</span>
+                        </div>
+                    @endif
+
+                    @if (!$email && !$website && !$linkedin && !$github && !$address)
+                        <p class="contact-copy">
+                            Contact information has not been added yet.
+                        </p>
+                    @endif
+                </div>
             </div>
         </section>
 
-        {{-- FOOTER --}}
+        {{-- Footer --}}
         <footer class="footer">
-            <p class="footer-brand">
-                {{ $portfolio->full_name }} / Portfolio
-            </p>
-
-            <p>
-                Made with purpose. Built to grow.
-            </p>
-
-            <p>
-                © {{ date('Y') }}
-            </p>
+            <span>© {{ date('Y') }} {{ $fullName }}</span>
+            <span>Designed with <strong>creativity &amp; intention</strong>.</span>
         </footer>
 
     </main>
