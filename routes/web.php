@@ -1,12 +1,11 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PortfolioController;
 
-
 Route::get('/', [PortfolioController::class, 'home'])
     ->name('home');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +18,6 @@ Route::get('/portfolio/create', [PortfolioController::class, 'create'])
 
 Route::post('/portfolio', [PortfolioController::class, 'store'])
     ->name('portfolio.store');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -39,7 +37,6 @@ Route::get('/portfolio/{id}/modern', [PortfolioController::class, 'modern'])
 Route::get('/portfolio/{id}/creative', [PortfolioController::class, 'creative'])
     ->name('portfolio.creative');
 
-
 /*
 |--------------------------------------------------------------------------
 | Template Customization
@@ -52,7 +49,6 @@ Route::get('/portfolio/{id}/customize', [PortfolioController::class, 'customize'
 Route::post('/portfolio/{id}/customize', [PortfolioController::class, 'saveCustomization'])
     ->name('portfolio.saveCustomization');
 
-
 /*
 |--------------------------------------------------------------------------
 | Portfolio Preview
@@ -62,7 +58,6 @@ Route::post('/portfolio/{id}/customize', [PortfolioController::class, 'saveCusto
 Route::get('/portfolio/{id}/preview', [PortfolioController::class, 'preview'])
     ->name('portfolio.preview');
 
-
 /*
 |--------------------------------------------------------------------------
 | Portfolio Management
@@ -71,6 +66,9 @@ Route::get('/portfolio/{id}/preview', [PortfolioController::class, 'preview'])
 
 Route::get('/portfolio/manage', [PortfolioController::class, 'manage'])
     ->name('portfolio.manage');
+
+Route::get('/portfolio/{id}/download', [PortfolioController::class, 'download'])
+    ->name('portfolio.download');
 
 Route::get('/portfolio/{id}/edit', [PortfolioController::class, 'edit'])
     ->name('portfolio.edit');

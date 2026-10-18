@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Portfolio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PortfolioController extends Controller
 {
@@ -13,12 +14,10 @@ class PortfolioController extends Controller
         return view('portfolio.home');
     }
 
-
     public function create()
     {
         return view('portfolio.create');
     }
-
 
     public function store(Request $request)
     {
@@ -40,26 +39,20 @@ class PortfolioController extends Controller
             'additional_info' => 'nullable|string',
         ]);
 
-
         if ($request->hasFile('profile_picture')) {
-
             $validated['profile_picture'] = $request
                 ->file('profile_picture')
                 ->store('profile-pictures', 'public');
         }
 
-
         $validated['template'] = 'simple';
 
-
         $portfolio = Portfolio::create($validated);
-
 
         return redirect()
             ->route('portfolio.templates', $portfolio->id)
             ->with('success', 'Portfolio information saved successfully.');
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -74,7 +67,6 @@ class PortfolioController extends Controller
         return view('portfolio.templates', compact('portfolio'));
     }
 
-
     public function simple($id)
     {
         $portfolio = Portfolio::findOrFail($id);
@@ -86,7 +78,6 @@ class PortfolioController extends Controller
         return redirect()
             ->route('portfolio.customize', $portfolio->id);
     }
-
 
     public function modern($id)
     {
@@ -100,7 +91,6 @@ class PortfolioController extends Controller
             ->route('portfolio.customize', $portfolio->id);
     }
 
-
     public function creative($id)
     {
         $portfolio = Portfolio::findOrFail($id);
@@ -112,7 +102,6 @@ class PortfolioController extends Controller
         return redirect()
             ->route('portfolio.customize', $portfolio->id);
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -126,7 +115,6 @@ class PortfolioController extends Controller
 
         return view('portfolio.customize', compact('portfolio'));
     }
-
 
     public function saveCustomization(Request $request, $id)
     {
@@ -144,7 +132,6 @@ class PortfolioController extends Controller
             ->with('success', 'Template customization saved successfully.');
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Portfolio Preview
@@ -156,7 +143,6 @@ class PortfolioController extends Controller
         $portfolio = Portfolio::findOrFail($id);
 
         return match ($portfolio->template) {
-
             'modern' => view(
                 'portfolio.modern',
                 compact('portfolio')
@@ -174,7 +160,6 @@ class PortfolioController extends Controller
         };
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Portfolio Management
@@ -191,6 +176,44 @@ class PortfolioController extends Controller
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Download Portfolio
+    |--------------------------------------------------------------------------
+    */
+
+    public function download($id)
+    {
+        $portfolio = Portfolio::findOrFail($id);
+
+        $view = match ($portfolio->template) {
+            'modern' => 'portfolio.modern',
+            'creative' => 'portfolio.creative',
+            default => 'portfolio.simple',
+        };
+
+        $html = view($view, compact('portfolio'))->render();
+
+        $filename = Str::slug(
+            $portfolio->full_name ?: 'portfolio'
+        ) . '-portfolio.html';
+
+        return response()->streamDownload(
+            function () use ($html) {
+                echo $html;
+            },
+            $filename,
+            [
+                'Content-Type' => 'text/html; charset=UTF-8',
+            ]
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Edit Portfolio
+    |--------------------------------------------------------------------------
+    */
 
     public function edit($id)
     {
@@ -202,11 +225,15 @@ class PortfolioController extends Controller
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Update Portfolio
+    |--------------------------------------------------------------------------
+    */
 
     public function update(Request $request, $id)
     {
         $portfolio = Portfolio::findOrFail($id);
-
 
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
@@ -226,9 +253,7 @@ class PortfolioController extends Controller
             'additional_info' => 'nullable|string',
         ]);
 
-
         if ($request->hasFile('profile_picture')) {
-
             if (
                 $portfolio->profile_picture &&
                 Storage::disk('public')->exists(
@@ -240,26 +265,27 @@ class PortfolioController extends Controller
                 );
             }
 
-
             $validated['profile_picture'] = $request
                 ->file('profile_picture')
                 ->store('profile-pictures', 'public');
         }
 
-
         $portfolio->update($validated);
-
 
         return redirect()
             ->route('portfolio.manage')
             ->with('success', 'Portfolio updated successfully.');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Delete Portfolio
+    |--------------------------------------------------------------------------
+    */
 
     public function destroy($id)
     {
         $portfolio = Portfolio::findOrFail($id);
-
 
         if (
             $portfolio->profile_picture &&
@@ -272,9 +298,7 @@ class PortfolioController extends Controller
             );
         }
 
-
         $portfolio->delete();
-
 
         return redirect()
             ->route('portfolio.manage')
