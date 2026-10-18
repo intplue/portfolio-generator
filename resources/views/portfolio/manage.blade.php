@@ -5,26 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $portfolio->full_name }} | Portfolio</title>
+    <title>Manage Portfolios | Portfolio Generator</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
 
     <style>
         :root {
-            --bg: #090e17;
-            --bg-soft: #0e1623;
-            --panel: #111c2b;
-            --panel-light: #162438;
-            --border: rgba(176, 198, 224, 0.13);
-            --text: #edf3fb;
-            --muted: #9aaabe;
-            --accent: #8eb8e8;
-            --accent-soft: rgba(142, 184, 232, 0.12);
-            --white: #ffffff;
+            --background: #f6f4ee;
+            --surface: #fffefa;
+            --surface-hover: #ffffff;
+            --text: #26362c;
+            --muted: #778278;
+            --green: #254936;
+            --green-light: #e9f0e8;
+            --border: #e7e5dc;
+            --lavender: #8b7ac5;
+            --lavender-light: #f2effb;
+            --rose: #c77e88;
+            --rose-light: #fbefef;
             --radius: 18px;
+            --shadow: 0 12px 35px rgba(38, 54, 44, 0.045);
         }
 
         * {
@@ -35,14 +41,13 @@
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 90px;
         }
 
         body {
-            background: var(--bg);
+            min-height: 100vh;
+            background: var(--background);
             color: var(--text);
             font-family: 'DM Sans', sans-serif;
-            line-height: 1.7;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -51,68 +56,42 @@
             text-decoration: none;
         }
 
-        img {
-            display: block;
-            max-width: 100%;
+        button,
+        input {
+            font: inherit;
         }
 
-        ::selection {
-            background: var(--accent);
-            color: var(--bg);
+        button,
+        a {
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .site-shell {
-            width: min(1160px, calc(100% - 48px));
-            margin: 0 auto;
-        }
-
-        .mono {
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 1.7px;
-            text-transform: uppercase;
-        }
-
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--accent);
-        }
-
-        .eyebrow::before {
-            content: '';
-            width: 24px;
-            height: 1px;
-            background: var(--accent);
-        }
-
-        .site-header {
+        .navbar {
             position: sticky;
             top: 0;
-            z-index: 20;
-            background: rgba(9, 14, 23, 0.9);
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(18px);
-        }
-
-        .nav {
-            min-height: 76px;
+            z-index: 10;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 24px;
+            min-height: 82px;
+            padding: 18px max(7%, calc((100% - 1120px) / 2));
+            background: rgba(246, 244, 238, 0.92);
+            border-bottom: 1px solid rgba(231, 229, 220, 0.9);
+            backdrop-filter: blur(16px);
         }
 
-        .brand {
+        .logo {
+            color: var(--green);
             font-family: 'Manrope', sans-serif;
             font-size: 17px;
             font-weight: 800;
-            letter-spacing: -0.7px;
+            letter-spacing: -0.6px;
+            white-space: nowrap;
         }
 
-        .brand span {
-            color: var(--accent);
+        .logo span {
+            color: var(--lavender);
         }
 
         .nav-links {
@@ -123,593 +102,447 @@
 
         .nav-links a {
             color: var(--muted);
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.1px;
             transition: color 0.2s ease;
         }
 
-        .nav-links a:hover {
-            color: var(--white);
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--green);
         }
 
-        .nav-contact {
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            padding: 9px 16px;
+        .page {
+            width: min(1050px, calc(100% - 48px));
+            margin: 0 auto;
+            padding: 66px 0 90px;
         }
 
-        .hero {
-            position: relative;
-            display: grid;
-            grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-            gap: 64px;
-            align-items: center;
-            min-height: 600px;
-            padding: 100px 0 96px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 55px;
-            left: -180px;
-            width: 420px;
-            height: 420px;
-            background: radial-gradient(circle, rgba(67, 112, 164, 0.12), transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero-copy {
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            margin: 25px 0;
-            font-family: 'Manrope', sans-serif;
-            font-size: clamp(44px, 6.5vw, 82px);
-            font-weight: 800;
-            line-height: 1.04;
-            letter-spacing: -4px;
-            overflow-wrap: anywhere;
-        }
-
-        .hero h1 span {
-            display: block;
-            color: var(--accent);
-        }
-
-        .hero-description {
-            max-width: 510px;
-            margin-bottom: 30px;
-            color: var(--muted);
-            font-size: 15px;
-            line-height: 1.9;
-            white-space: pre-line;
-        }
-
-        .hero-actions {
+        .page-header {
             display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 32px;
         }
 
-        .button {
-            display: inline-flex;
-            justify-content: center;
+        .eyebrow {
+            display: flex;
             align-items: center;
             gap: 10px;
-            min-height: 46px;
-            padding: 12px 19px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            transition: transform 0.2s ease, background 0.2s ease;
-        }
-
-        .button:hover {
-            transform: translateY(-2px);
-        }
-
-        .button-primary {
-            background: var(--accent);
-            color: #091321;
-            border-color: var(--accent);
-        }
-
-        .button-secondary {
-            color: var(--text);
-        }
-
-        .hero-visual {
-            position: relative;
-            justify-self: end;
-            width: 100%;
-            max-width: 380px;
-        }
-
-        .portrait-frame {
-            position: relative;
-            aspect-ratio: 4 / 5;
-            padding: 12px;
-            border: 1px solid rgba(142, 184, 232, 0.28);
-            border-radius: 190px 190px 14px 14px;
-            background: linear-gradient(145deg, #1b2c41, #0b121e);
-        }
-
-        .portrait-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 180px 180px 8px 8px;
-        }
-
-        .portrait-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 180px 180px 8px 8px;
-            background: linear-gradient(145deg, #243952, #111c2b);
-            color: var(--accent);
-            font-family: 'Manrope', sans-serif;
-            font-size: clamp(56px, 8vw, 100px);
-            font-weight: 800;
-        }
-
-        .portrait-caption {
-            position: absolute;
-            right: -20px;
-            bottom: 28px;
-            max-width: 190px;
-            padding: 14px 18px;
-            background: var(--panel-light);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
-        }
-
-        .portrait-caption p:first-child {
-            margin-bottom: 3px;
-            color: var(--accent);
-        }
-
-        .portrait-caption p:last-child {
-            color: var(--text);
-            font-size: 12px;
-        }
-
-        .section {
-            padding: 100px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .section-heading {
-            display: flex;
-            justify-content: space-between;
-            align-items: end;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .section-heading h2 {
-            margin-top: 13px;
-            font-family: 'Manrope', sans-serif;
-            font-size: clamp(30px, 4vw, 45px);
+            margin-bottom: 15px;
+            color: var(--lavender);
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: -1.8px;
-            line-height: 1.2;
-        }
-
-        .section-index {
-            color: #63748b;
-        }
-
-        .about-grid {
-            display: grid;
-            grid-template-columns: 0.75fr 1.25fr;
-            gap: 24px;
-        }
-
-        .about-label {
-            padding: 28px;
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-        }
-
-        .about-label .big-number {
-            display: block;
-            margin-top: 26px;
-            color: var(--accent);
-            font-family: 'Manrope', sans-serif;
-            font-size: clamp(45px, 6vw, 72px);
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -4px;
-        }
-
-        .about-label p:last-child {
-            margin-top: 14px;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .about-content {
-            padding: 30px;
-            background: var(--bg-soft);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-        }
-
-        .about-content p {
-            color: #b7c4d5;
-            font-size: 15px;
-            line-height: 2;
-            white-space: pre-line;
-            overflow-wrap: anywhere;
-        }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
-        }
-
-        .skill-card {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            min-height: 100px;
-            padding: 22px;
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: border-color 0.2s ease, transform 0.2s ease;
-        }
-
-        .skill-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(142, 184, 232, 0.45);
-        }
-
-        .skill-number {
-            color: var(--accent);
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-        }
-
-        .skill-card p {
-            font-size: 13px;
-            font-weight: 600;
-            overflow-wrap: anywhere;
-        }
-
-        .timeline {
-            display: grid;
-            gap: 14px;
-        }
-
-        .timeline-card {
-            display: grid;
-            grid-template-columns: 190px minmax(0, 1fr);
-            gap: 28px;
-            padding: 28px;
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-        }
-
-        .timeline-marker {
-            color: var(--accent);
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
-        .timeline-content h3 {
-            margin-bottom: 8px;
-            font-family: 'Manrope', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 1.5;
-            overflow-wrap: anywhere;
-        }
-
-        .timeline-content p {
-            color: var(--muted);
-            font-size: 13px;
-            line-height: 1.9;
-            white-space: pre-line;
-            overflow-wrap: anywhere;
-        }
-
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px;
-        }
-
-        .project-card {
-            position: relative;
-            min-height: 235px;
-            padding: 30px;
-            overflow: hidden;
-            background: linear-gradient(145deg, var(--panel-light), var(--panel));
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-        }
-
-        .project-card::after {
+        .eyebrow::before {
+            width: 22px;
+            height: 1px;
+            background: currentColor;
             content: '';
-            position: absolute;
-            right: -60px;
-            bottom: -100px;
-            width: 220px;
-            height: 220px;
-            border: 1px solid rgba(142, 184, 232, 0.12);
-            border-radius: 50%;
-            box-shadow: 0 0 0 24px rgba(142, 184, 232, 0.025),
-                        0 0 0 48px rgba(142, 184, 232, 0.02);
-            pointer-events: none;
         }
 
-        .project-number {
-            display: block;
-            margin-bottom: 34px;
-            color: var(--accent);
-        }
-
-        .project-card h3 {
-            position: relative;
-            z-index: 1;
+        .page-header h1 {
             margin-bottom: 12px;
+            color: var(--green);
             font-family: 'Manrope', sans-serif;
-            font-size: 21px;
-            font-weight: 700;
-            line-height: 1.45;
-            white-space: pre-line;
-            overflow-wrap: anywhere;
-        }
-
-        .project-card p {
-            position: relative;
-            z-index: 1;
-            max-width: 460px;
-            color: var(--muted);
-            font-size: 13px;
-            white-space: pre-line;
-            overflow-wrap: anywhere;
-        }
-
-        .additional-card {
-            padding: 30px;
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: #b7c4d5;
-            font-size: 14px;
-            line-height: 2;
-            white-space: pre-line;
-            overflow-wrap: anywhere;
-        }
-
-        .contact-section {
-            padding: 85px 0;
-            background: linear-gradient(180deg, var(--bg), #0c1521);
-        }
-
-        .contact-panel {
-            padding: clamp(28px, 5vw, 56px);
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-        }
-
-        .contact-panel h2 {
-            max-width: 650px;
-            margin: 18px 0;
-            font-family: 'Manrope', sans-serif;
-            font-size: clamp(35px, 5vw, 60px);
+            font-size: clamp(34px, 5vw, 49px);
             font-weight: 800;
-            letter-spacing: -2.5px;
-            line-height: 1.1;
+            line-height: 1.15;
+            letter-spacing: -2px;
         }
 
-        .contact-panel h2 span {
-            color: var(--accent);
-        }
-
-        .contact-description {
-            max-width: 500px;
-            margin-bottom: 28px;
+        .page-header p {
+            max-width: 530px;
             color: var(--muted);
             font-size: 14px;
+            line-height: 1.8;
         }
 
-        .contact-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .social-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-        .social-links a {
-            padding: 9px 13px;
-            color: var(--muted);
+        .portfolio-count {
+            flex-shrink: 0;
+            padding: 10px 14px;
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 7px;
-            font-size: 12px;
-            transition: color 0.2s ease, border-color 0.2s ease;
+            border-radius: 999px;
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 700;
         }
 
-        .social-links a:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .site-footer {
-            padding: 25px 0;
-            border-top: 1px solid var(--border);
-        }
-
-        .footer-inner {
+        .success-message {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 15px 18px;
+            background: var(--green-light);
+            border: 1px solid #d8e5d7;
+            border-radius: 12px;
+            color: var(--green);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .success-dot {
+            width: 8px;
+            height: 8px;
+            flex-shrink: 0;
+            background: #62856a;
+            border-radius: 50%;
+        }
+
+        .portfolio-list {
+            display: grid;
             gap: 16px;
         }
 
-        .footer-inner p {
-            color: #78879b;
-            font-size: 11px;
+        .portfolio-card {
+            padding: 27px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: border-color 0.2s ease,
+                        transform 0.2s ease,
+                        box-shadow 0.2s ease;
         }
 
-        .back-top {
-            color: var(--accent) !important;
+        .portfolio-card:hover {
+            transform: translateY(-2px);
+            background: var(--surface-hover);
+            border-color: #d8dfd3;
+            box-shadow: 0 16px 38px rgba(38, 54, 44, 0.065);
+        }
+
+        .portfolio-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+        }
+
+        .portfolio-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .portfolio-topline {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 9px;
+        }
+
+        .portfolio-info h2 {
+            overflow-wrap: anywhere;
+            color: var(--green);
+            font-family: 'Manrope', sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .template-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+            background: #f0eee6;
+            border: 1px solid #e8e5db;
+            border-radius: 999px;
+            color: #697367;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.9px;
+            text-transform: uppercase;
+        }
+
+        .template-label::before {
+            width: 5px;
+            height: 5px;
+            background: var(--lavender);
+            border-radius: 50%;
+            content: '';
+        }
+
+        .portfolio-email {
+            overflow-wrap: anywhere;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .portfolio-contact {
+            margin-top: 3px;
+            color: #969d94;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-shrink: 0;
+            gap: 9px;
+        }
+
+        .actions a,
+        .actions button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--green);
+            cursor: pointer;
+            transition: transform 0.2s ease,
+                        background 0.2s ease,
+                        border-color 0.2s ease,
+                        color 0.2s ease;
+        }
+
+        .actions a:hover,
+        .actions button:hover {
+            transform: translateY(-2px);
+        }
+
+        .actions a:focus-visible,
+        .actions button:focus-visible,
+        .create-button:focus-visible,
+        .nav-links a:focus-visible {
+            outline: 3px solid rgba(139, 122, 197, 0.35);
+            outline-offset: 3px;
+        }
+
+        .actions svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .view-button:hover {
+            background: var(--green-light);
+            border-color: #cdddcf;
+            color: var(--green);
+        }
+
+        .edit-button,
+        .download-button {
+            color: var(--lavender) !important;
+        }
+
+        .edit-button:hover,
+        .download-button:hover {
+            background: var(--lavender-light);
+            border-color: #dcd4f2;
+        }
+
+        .delete-button {
+            color: var(--rose) !important;
+        }
+
+        .delete-button:hover {
+            background: var(--rose-light);
+            border-color: #efcfd3;
+        }
+
+        .actions form {
+            margin: 0;
         }
 
         .empty-state {
-            grid-column: 1 / -1;
-            padding: 25px;
+            padding: 65px 25px;
+            background: var(--surface);
+            border: 1px dashed #d8d9cc;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .empty-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 62px;
+            height: 62px;
+            margin: 0 auto 23px;
+            background: var(--green-light);
+            border-radius: 20px;
+            color: var(--green);
+        }
+
+        .empty-icon svg {
+            width: 27px;
+            height: 27px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 10px;
+            color: var(--green);
+            font-family: 'Manrope', sans-serif;
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: -0.7px;
+        }
+
+        .empty-state p {
+            max-width: 390px;
+            margin: 0 auto 25px;
             color: var(--muted);
-            background: var(--panel);
-            border: 1px dashed var(--border);
-            border-radius: 12px;
             font-size: 13px;
+            line-height: 1.9;
         }
 
-        @media (max-width: 850px) {
-            .hero {
-                grid-template-columns: 1fr 0.7fr;
-                gap: 30px;
-                min-height: auto;
-                padding: 80px 0;
-            }
-
-            .hero h1 {
-                letter-spacing: -2.5px;
-            }
-
-            .portrait-caption {
-                right: -8px;
-            }
-
-            .skills-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .timeline-card {
-                grid-template-columns: 140px minmax(0, 1fr);
-                gap: 20px;
-            }
+        .create-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 46px;
+            padding: 0 20px;
+            background: var(--green);
+            border: 1px solid var(--green);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.7px;
+            transition: background 0.2s ease,
+                        transform 0.2s ease;
         }
 
-        @media (max-width: 600px) {
-            .site-shell {
-                width: min(100% - 32px, 1160px);
-            }
+        .create-button:hover {
+            transform: translateY(-2px);
+            background: #315b40;
+        }
 
-            .nav {
-                min-height: 68px;
+        .create-button svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .page-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 35px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+            color: #92988e;
+            font-size: 11px;
+        }
+
+        .page-footer a {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .page-footer a:hover {
+            color: var(--lavender);
+        }
+
+        @media (max-width: 760px) {
+            .navbar {
+                min-height: 72px;
+                padding: 17px 6%;
             }
 
             .nav-links {
-                gap: 14px;
+                gap: 17px;
             }
 
-            .nav-links a {
-                font-size: 11px;
+            .page {
+                width: calc(100% - 36px);
+                padding-top: 45px;
             }
 
-            .nav-links .nav-contact {
-                display: none;
+            .page-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 18px;
             }
 
-            .hero {
-                grid-template-columns: 1fr;
-                gap: 42px;
-                padding: 68px 0;
-            }
-
-            .hero h1 {
-                font-size: clamp(43px, 13vw, 68px);
-                letter-spacing: -2.5px;
-            }
-
-            .hero-visual {
-                justify-self: center;
-                max-width: 290px;
-                margin-right: 10px;
-            }
-
-            .section {
-                padding: 70px 0;
-            }
-
-            .section-heading {
-                margin-bottom: 28px;
-            }
-
-            .about-grid,
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .about-label,
-            .about-content {
-                padding: 23px;
-            }
-
-            .skills-grid {
-                gap: 10px;
-            }
-
-            .skill-card {
-                min-height: 85px;
-                padding: 15px;
-                gap: 10px;
-            }
-
-            .timeline-card {
-                grid-template-columns: 1fr;
-                gap: 12px;
+            .portfolio-card {
                 padding: 22px;
             }
 
-            .project-card {
-                min-height: 210px;
-                padding: 24px;
+            .portfolio-main {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 22px;
             }
 
-            .contact-panel {
-                padding: 26px 22px;
+            .actions {
+                width: 100%;
+                justify-content: flex-start;
             }
 
-            .contact-panel h2 {
-                letter-spacing: -1.5px;
+            .portfolio-count {
+                align-self: flex-start;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .logo {
+                font-size: 14px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a {
+                font-size: 10px;
+            }
+
+            .page-header h1 {
+                font-size: 34px;
+            }
+
+            .portfolio-card {
+                padding: 18px;
+            }
+
+            .portfolio-info h2 {
+                font-size: 19px;
+            }
+
+            .page-footer {
+                align-items: flex-start;
+                flex-direction: column;
             }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
-            }
-
             *,
             *::before,
             *::after {
+                scroll-behavior: auto !important;
                 transition: none !important;
             }
         }
@@ -717,328 +550,199 @@
 </head>
 
 <body>
-    @php
-        $imageUrl = $portfolio->profile_picture
-            ? (\Illuminate\Support\Str::startsWith($portfolio->profile_picture, ['http://', 'https://'])
-                ? $portfolio->profile_picture
-                : asset('storage/' . $portfolio->profile_picture))
-            : null;
 
-        $skills = $portfolio->skills
-            ? preg_split('/[\r\n,;]+/', $portfolio->skills, -1, PREG_SPLIT_NO_EMPTY)
-            : [];
+    <nav class="navbar">
+        <a class="logo" href="{{ route('home') }}">
+            Portfolio Generator<span>.</span>
+        </a>
 
-        $initials = collect(preg_split('/\s+/', trim($portfolio->full_name)))
-            ->filter()
-            ->take(2)
-            ->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))
-            ->implode('');
-
-        $websiteUrl = $portfolio->website
-            ? (\Illuminate\Support\Str::startsWith($portfolio->website, ['http://', 'https://'])
-                ? $portfolio->website
-                : 'https://' . $portfolio->website)
-            : null;
-
-        $linkedinUrl = $portfolio->linkedin
-            ? (\Illuminate\Support\Str::startsWith($portfolio->linkedin, ['http://', 'https://'])
-                ? $portfolio->linkedin
-                : 'https://' . $portfolio->linkedin)
-            : null;
-
-        $githubUrl = $portfolio->github
-            ? (\Illuminate\Support\Str::startsWith($portfolio->github, ['http://', 'https://'])
-                ? $portfolio->github
-                : 'https://' . $portfolio->github)
-            : null;
-
-        $socialLinks = $portfolio->social_links
-            ? preg_split('/[\r\n]+/', $portfolio->social_links, -1, PREG_SPLIT_NO_EMPTY)
-            : [];
-
-        $projectItems = $portfolio->projects
-            ? preg_split('/\n\s*\n/', trim($portfolio->projects), -1, PREG_SPLIT_NO_EMPTY)
-            : [];
-
-        $educationItems = $portfolio->educational_background
-            ? preg_split('/\n\s*\n/', trim($portfolio->educational_background), -1, PREG_SPLIT_NO_EMPTY)
-            : [];
-
-        $experienceItems = $portfolio->work_experience
-            ? preg_split('/\n\s*\n/', trim($portfolio->work_experience), -1, PREG_SPLIT_NO_EMPTY)
-            : [];
-    @endphp
-
-    <header class="site-header" id="top">
-        <div class="site-shell nav">
-            <a class="brand" href="#top">
-                {{ $portfolio->full_name }}<span>.</span>
-            </a>
-
-            <nav class="nav-links mono" aria-label="Main navigation">
-                <a href="#about">About</a>
-                <a href="#skills">Skills</a>
-                <a href="#work">Work</a>
-                <a href="#contact" class="nav-contact">Contact ↗</a>
-            </nav>
+        <div class="nav-links">
+            <a href="{{ route('home') }}">HOME</a>
+            <a href="{{ route('portfolio.create') }}">CREATE</a>
         </div>
-    </header>
+    </nav>
 
-    <main>
-        <section class="site-shell hero">
-            <div class="hero-copy">
-                <p class="eyebrow mono">Personal Portfolio</p>
+    <main class="page">
 
-                <h1>
-                    {{ $portfolio->full_name }}
-                    <span>Portfolio.</span>
-                </h1>
+        <header class="page-header">
+            <div>
+                <p class="eyebrow">Your workspace</p>
 
-                <p class="hero-description">{{ $portfolio->about_me ?: 'Welcome to my personal portfolio. Explore my background, skills, and work.' }}</p>
+                <h1>My portfolios.</h1>
 
-                <div class="hero-actions">
-                    <a class="button button-primary" href="#work">
-                        Explore my work <span aria-hidden="true">↗</span>
-                    </a>
-
-                    <a class="button button-secondary" href="#contact">
-                        Get in touch
-                    </a>
-                </div>
+                <p>
+                    Everything you've created, all in one place.
+                    View your work, make changes, or download a copy.
+                </p>
             </div>
 
-            <div class="hero-visual">
-                <div class="portrait-frame">
-                    @if ($imageUrl)
-                        <img src="{{ $imageUrl }}" alt="Portrait of {{ $portfolio->full_name }}">
-                    @else
-                        <div class="portrait-placeholder" aria-label="Profile initials">
-                            {{ $initials ?: 'ME' }}
+            @if ($portfolios->count())
+                <div class="portfolio-count">
+                    {{ $portfolios->count() }}
+                    {{ $portfolios->count() === 1 ? 'PORTFOLIO' : 'PORTFOLIOS' }}
+                </div>
+            @endif
+        </header>
+
+        @if (session('success'))
+            <div class="success-message" role="status">
+                <span class="success-dot" aria-hidden="true"></span>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if ($portfolios->count())
+
+            <section class="portfolio-list" aria-label="Saved portfolios">
+
+                @foreach ($portfolios as $portfolio)
+
+                    <article class="portfolio-card">
+
+                        <div class="portfolio-main">
+
+                            <div class="portfolio-info">
+
+                                <div class="portfolio-topline">
+                                    <h2>{{ $portfolio->full_name }}</h2>
+
+                                    <span class="template-label">
+                                        {{ ucfirst($portfolio->template ?: 'simple') }}
+                                    </span>
+                                </div>
+
+                                <p class="portfolio-email">
+                                    {{ $portfolio->email }}
+                                </p>
+
+                                @if ($portfolio->contact_number)
+                                    <p class="portfolio-contact">
+                                        {{ $portfolio->contact_number }}
+                                    </p>
+                                @endif
+
+                            </div>
+
+                            <div class="actions">
+
+                                {{-- View portfolio --}}
+                                <a
+                                    href="{{ route('portfolio.preview', $portfolio->id) }}"
+                                    class="view-button"
+                                    title="View portfolio"
+                                    aria-label="View portfolio for {{ $portfolio->full_name }}"
+                                >
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </a>
+
+                                {{-- Edit portfolio --}}
+                                <a
+                                    href="{{ route('portfolio.edit', $portfolio->id) }}"
+                                    class="edit-button"
+                                    title="Edit portfolio"
+                                    aria-label="Edit portfolio for {{ $portfolio->full_name }}"
+                                >
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M12 20h9"/>
+                                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+                                    </svg>
+                                </a>
+
+                                {{-- Download portfolio --}}
+                                <a
+                                    href="{{ route('portfolio.download', $portfolio->id) }}"
+                                    class="download-button"
+                                    title="Download portfolio"
+                                    aria-label="Download portfolio for {{ $portfolio->full_name }}"
+                                >
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <path d="m7 10 5 5 5-5"/>
+                                        <path d="M12 15V3"/>
+                                    </svg>
+                                </a>
+
+                                {{-- Delete portfolio --}}
+                                <form
+                                    action="{{ route('portfolio.destroy', $portfolio->id) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete this portfolio? This action cannot be undone.');"
+                                >
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button
+                                        type="submit"
+                                        class="delete-button"
+                                        title="Delete portfolio"
+                                        aria-label="Delete portfolio for {{ $portfolio->full_name }}"
+                                    >
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M3 6h18"/>
+                                            <path d="M8 6V4h8v2"/>
+                                            <path d="m19 6-1 14H6L5 6"/>
+                                            <path d="M10 11v5"/>
+                                            <path d="M14 11v5"/>
+                                        </svg>
+                                    </button>
+                                </form>
+
+                            </div>
+
                         </div>
-                    @endif
-                </div>
 
-                <div class="portrait-caption">
-                    <p class="mono">Portfolio / 01</p>
-                    <p>{{ $portfolio->full_name }}</p>
-                </div>
-            </div>
-        </section>
+                    </article>
 
-        <section class="site-shell section" id="about">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow mono">A little about me</p>
-                    <h2>Beyond the introduction.</h2>
-                </div>
+                @endforeach
 
-                <span class="section-index mono">01 / ABOUT</span>
-            </div>
-
-            <div class="about-grid">
-                <div class="about-label">
-                    <span class="mono">The person behind the work</span>
-
-                    <span class="big-number">01<span style="color: var(--text)">.</span></span>
-
-                    <p>Background, interests, and personal journey.</p>
-                </div>
-
-                <div class="about-content">
-                    <p>{{ $portfolio->about_me ?: 'My personal and professional journey will be shared here.' }}</p>
-                </div>
-            </div>
-        </section>
-
-        @if (!empty($skills))
-            <section class="site-shell section" id="skills">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow mono">Capabilities</p>
-                        <h2>Skills &amp; strengths.</h2>
-                    </div>
-
-                    <span class="section-index mono">02 / SKILLS</span>
-                </div>
-
-                <div class="skills-grid">
-                    @foreach ($skills as $index => $skill)
-                        <article class="skill-card">
-                            <span class="skill-number">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                            <p>{{ trim($skill) }}</p>
-                        </article>
-                    @endforeach
-                </div>
             </section>
+
+        @else
+
+            <section class="empty-state">
+
+                <div class="empty-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 4h16v16H4z"/>
+                        <path d="M8 9h8"/>
+                        <path d="M8 13h5"/>
+                        <path d="M8 17h3"/>
+                    </svg>
+                </div>
+
+                <h2>Your story starts here.</h2>
+
+                <p>
+                    You haven't created a portfolio yet.
+                    Start with your information, choose a design,
+                    and build a portfolio that feels like you.
+                </p>
+
+                <a
+                    href="{{ route('portfolio.create') }}"
+                    class="create-button"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 5v14"/>
+                        <path d="M5 12h14"/>
+                    </svg>
+                    CREATE YOUR FIRST PORTFOLIO
+                </a>
+
+            </section>
+
         @endif
 
-        @if (!empty($educationItems))
-            <section class="site-shell section" id="education">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow mono">Academic journey</p>
-                        <h2>Education.</h2>
-                    </div>
+        <footer class="page-footer">
+            <p>Made for your next chapter.</p>
 
-                    <span class="section-index mono">03 / EDUCATION</span>
-                </div>
+            <a href="{{ route('home') }}">Back to home ↗</a>
+        </footer>
 
-                <div class="timeline">
-                    @foreach ($educationItems as $index => $education)
-                        <article class="timeline-card">
-                            <div class="timeline-marker">
-                                Entry {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
-                            </div>
-
-                            <div class="timeline-content">
-                                <h3>{{ trim($education) }}</h3>
-                            </div>
-                        </article>
-                    @endforeach
-                </div>
-            </section>
-        @endif
-
-        @if (!empty($experienceItems))
-            <section class="site-shell section" id="experience">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow mono">Experience</p>
-                        <h2>Where I've worked.</h2>
-                    </div>
-
-                    <span class="section-index mono">04 / EXPERIENCE</span>
-                </div>
-
-                <div class="timeline">
-                    @foreach ($experienceItems as $index => $experience)
-                        <article class="timeline-card">
-                            <div class="timeline-marker">
-                                Experience {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
-                            </div>
-
-                            <div class="timeline-content">
-                                <h3>{{ trim($experience) }}</h3>
-                            </div>
-                        </article>
-                    @endforeach
-                </div>
-            </section>
-        @endif
-
-        @if (!empty($projectItems))
-            <section class="site-shell section" id="work">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow mono">Selected work</p>
-                        <h2>Projects &amp; creations.</h2>
-                    </div>
-
-                    <span class="section-index mono">05 / PROJECTS</span>
-                </div>
-
-                <div class="projects-grid">
-                    @foreach ($projectItems as $index => $project)
-                        <article class="project-card">
-                            <span class="project-number mono">
-                                PROJECT / {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
-                            </span>
-
-                            <h3>{{ trim($project) }}</h3>
-                        </article>
-                    @endforeach
-                </div>
-            </section>
-        @endif
-
-        @if ($portfolio->additional_info)
-            <section class="site-shell section" id="additional">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow mono">More to know</p>
-                        <h2>Additional information.</h2>
-                    </div>
-
-                    <span class="section-index mono">06 / DETAILS</span>
-                </div>
-
-                <div class="additional-card">
-                    {{ $portfolio->additional_info }}
-                </div>
-            </section>
-        @endif
-
-        <section class="contact-section" id="contact">
-            <div class="site-shell">
-                <div class="contact-panel">
-                    <p class="eyebrow mono">Get in touch</p>
-
-                    <h2>
-                        Let's start a
-                        <span>conversation.</span>
-                    </h2>
-
-                    <p class="contact-description">
-                        Thank you for taking the time to explore my portfolio.
-                        Feel free to reach out through the contact details below.
-                    </p>
-
-                    <div class="contact-links">
-                        @if ($portfolio->email)
-                            <a class="button button-primary" href="mailto:{{ $portfolio->email }}">
-                                Email me ↗
-                            </a>
-                        @endif
-
-                        @if ($websiteUrl)
-                            <a class="button button-secondary" href="{{ $websiteUrl }}" target="_blank" rel="noopener noreferrer">
-                                Personal website ↗
-                            </a>
-                        @endif
-
-                        @if ($linkedinUrl)
-                            <a class="button button-secondary" href="{{ $linkedinUrl }}" target="_blank" rel="noopener noreferrer">
-                                LinkedIn ↗
-                            </a>
-                        @endif
-
-                        @if ($githubUrl)
-                            <a class="button button-secondary" href="{{ $githubUrl }}" target="_blank" rel="noopener noreferrer">
-                                GitHub ↗
-                            </a>
-                        @endif
-                    </div>
-
-                    @if ($portfolio->address)
-                        <div class="social-links">
-                            <span class="mono" style="color: var(--muted); padding: 9px 0;">
-                                Location: {{ $portfolio->address }}
-                            </span>
-                        </div>
-                    @endif
-
-                    @if (!empty($socialLinks))
-                        <div class="social-links">
-                            @foreach ($socialLinks as $socialLink)
-                                <span>{{ trim($socialLink) }}</span>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="site-shell footer-inner">
-            <p>© {{ date('Y') }} {{ $portfolio->full_name }}. All rights reserved.</p>
-
-            <a href="#top" class="mono back-top">Back to top ↑</a>
-
-            <a href="{{ route('home') }}" class="mono" style="color: var(--muted);">
-                Create your portfolio
-            </a>
-        </div>
-    </footer>
 </body>
 </html>

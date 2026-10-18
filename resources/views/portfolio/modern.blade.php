@@ -5,23 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $portfolio->full_name }} | Modern Portfolio</title>
+    <title>{{ $portfolio->full_name }} | Portfolio</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --bg: #090e17;
-            --surface: #101927;
-            --surface-light: #152338;
-            --border: rgba(177, 201, 230, 0.14);
+            --bg-soft: #0e1623;
+            --panel: #111c2b;
+            --panel-light: #162438;
+            --border: rgba(176, 198, 224, 0.13);
             --text: #edf3fb;
-            --muted: #9baabe;
-            --accent: #91b9e8;
-            --accent-soft: rgba(145, 185, 232, 0.1);
-            --radius: 16px;
+            --muted: #9aaabe;
+            --accent: #8eb8e8;
+            --accent-soft: rgba(142, 184, 232, 0.12);
+            --white: #ffffff;
+            --radius: 18px;
         }
 
         * {
@@ -32,7 +35,7 @@
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 85px;
+            scroll-padding-top: 90px;
         }
 
         body {
@@ -58,54 +61,54 @@
             color: var(--bg);
         }
 
-        .container {
-            width: min(1120px, calc(100% - 48px));
+        .site-shell {
+            width: min(1160px, calc(100% - 48px));
             margin: 0 auto;
         }
 
         .mono {
             font-family: 'DM Mono', monospace;
             font-size: 11px;
-            letter-spacing: 1.5px;
+            letter-spacing: 1.7px;
             text-transform: uppercase;
         }
 
         .eyebrow {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 11px;
+            gap: 12px;
             color: var(--accent);
         }
 
         .eyebrow::before {
             content: '';
-            width: 23px;
+            width: 24px;
             height: 1px;
             background: var(--accent);
         }
 
-        .header {
+        .site-header {
             position: sticky;
             top: 0;
-            z-index: 10;
-            background: rgba(9, 14, 23, 0.92);
+            z-index: 20;
+            background: rgba(9, 14, 23, 0.9);
             border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(18px);
         }
 
         .nav {
-            min-height: 74px;
+            min-height: 76px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
+            gap: 24px;
         }
 
         .brand {
             font-family: 'Manrope', sans-serif;
-            font-weight: 800;
             font-size: 17px;
-            letter-spacing: -0.6px;
+            font-weight: 800;
+            letter-spacing: -0.7px;
         }
 
         .brand span {
@@ -115,47 +118,59 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 26px;
+            gap: 28px;
         }
 
         .nav-links a {
             color: var(--muted);
             font-size: 12px;
-            transition: color .2s ease;
+            transition: color 0.2s ease;
         }
 
         .nav-links a:hover {
-            color: var(--text);
+            color: var(--white);
         }
 
-        .nav-links .nav-button {
+        .nav-contact {
             border: 1px solid var(--border);
-            border-radius: 7px;
-            padding: 8px 14px;
+            border-radius: 999px;
+            padding: 9px 16px;
         }
 
         .hero {
+            position: relative;
             display: grid;
-            grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr);
-            gap: 70px;
+            grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+            gap: 64px;
             align-items: center;
-            min-height: 610px;
-            padding-top: 85px;
-            padding-bottom: 85px;
+            min-height: 600px;
+            padding: 100px 0 96px;
             border-bottom: 1px solid var(--border);
         }
 
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 55px;
+            left: -180px;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(67, 112, 164, 0.12), transparent 70%);
+            pointer-events: none;
+        }
+
         .hero-copy {
-            min-width: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .hero h1 {
-            margin: 26px 0;
+            margin: 25px 0;
             font-family: 'Manrope', sans-serif;
-            font-size: clamp(45px, 6.5vw, 78px);
+            font-size: clamp(44px, 6.5vw, 82px);
             font-weight: 800;
-            line-height: 1.05;
-            letter-spacing: -3.8px;
+            line-height: 1.04;
+            letter-spacing: -4px;
             overflow-wrap: anywhere;
         }
 
@@ -166,31 +181,32 @@
 
         .hero-description {
             max-width: 510px;
+            margin-bottom: 30px;
             color: var(--muted);
-            font-size: 14px;
-            line-height: 2;
+            font-size: 15px;
+            line-height: 1.9;
             white-space: pre-line;
-            overflow-wrap: anywhere;
         }
 
         .hero-actions {
             display: flex;
+            align-items: center;
             flex-wrap: wrap;
             gap: 12px;
-            margin-top: 30px;
         }
 
         .button {
             display: inline-flex;
-            align-items: center;
             justify-content: center;
-            gap: 9px;
-            padding: 12px 18px;
+            align-items: center;
+            gap: 10px;
+            min-height: 46px;
+            padding: 12px 19px;
             border: 1px solid var(--border);
-            border-radius: 7px;
+            border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
-            transition: transform .2s ease, background .2s ease;
+            transition: transform 0.2s ease, background 0.2s ease;
         }
 
         .button:hover {
@@ -199,69 +215,75 @@
 
         .button-primary {
             background: var(--accent);
+            color: #091321;
             border-color: var(--accent);
-            color: #0a1422;
         }
 
         .button-secondary {
             color: var(--text);
         }
 
-        .hero-image-wrap {
+        .hero-visual {
             position: relative;
-            width: 100%;
-            max-width: 360px;
             justify-self: end;
+            width: 100%;
+            max-width: 380px;
         }
 
-        .hero-image {
+        .portrait-frame {
+            position: relative;
             aspect-ratio: 4 / 5;
-            padding: 11px;
-            background: linear-gradient(145deg, #223751, #101927);
-            border: 1px solid rgba(145, 185, 232, .35);
-            border-radius: 180px 180px 12px 12px;
+            padding: 12px;
+            border: 1px solid rgba(142, 184, 232, 0.28);
+            border-radius: 190px 190px 14px 14px;
+            background: linear-gradient(145deg, #1b2c41, #0b121e);
         }
 
-        .hero-image img,
-        .image-placeholder {
+        .portrait-frame img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 170px 170px 6px 6px;
+            border-radius: 180px 180px 8px 8px;
         }
 
-        .image-placeholder {
-            display: grid;
-            place-items: center;
-            background: var(--surface-light);
+        .portrait-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 180px 180px 8px 8px;
+            background: linear-gradient(145deg, #243952, #111c2b);
             color: var(--accent);
             font-family: 'Manrope', sans-serif;
-            font-size: 82px;
+            font-size: clamp(56px, 8vw, 100px);
             font-weight: 800;
         }
 
-        .image-label {
+        .portrait-caption {
             position: absolute;
-            right: -18px;
-            bottom: 26px;
-            padding: 13px 17px;
-            background: var(--surface-light);
+            right: -20px;
+            bottom: 28px;
+            max-width: 190px;
+            padding: 14px 18px;
+            background: var(--panel-light);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, .25);
+            border-radius: 10px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
         }
 
-        .image-label .mono {
+        .portrait-caption p:first-child {
+            margin-bottom: 3px;
             color: var(--accent);
         }
 
-        .image-label p:last-child {
-            margin-top: 3px;
+        .portrait-caption p:last-child {
+            color: var(--text);
             font-size: 12px;
         }
 
         .section {
-            padding: 90px 0;
+            padding: 100px 0;
             border-bottom: 1px solid var(--border);
         }
 
@@ -269,62 +291,63 @@
             display: flex;
             justify-content: space-between;
             align-items: end;
-            gap: 24px;
-            margin-bottom: 35px;
+            gap: 30px;
+            margin-bottom: 40px;
         }
 
         .section-heading h2 {
-            margin-top: 12px;
+            margin-top: 13px;
             font-family: 'Manrope', sans-serif;
-            font-size: clamp(29px, 4vw, 43px);
-            line-height: 1.2;
+            font-size: clamp(30px, 4vw, 45px);
+            font-weight: 700;
             letter-spacing: -1.8px;
+            line-height: 1.2;
         }
 
-        .section-number {
-            flex-shrink: 0;
-            color: #64758c;
+        .section-index {
+            color: #63748b;
         }
 
         .about-grid {
             display: grid;
-            grid-template-columns: .75fr 1.25fr;
-            gap: 18px;
+            grid-template-columns: 0.75fr 1.25fr;
+            gap: 24px;
         }
 
-        .about-card,
-        .about-copy {
+        .about-label {
             padding: 28px;
+            background: var(--panel);
             border: 1px solid var(--border);
             border-radius: var(--radius);
         }
 
-        .about-card {
-            background: var(--surface-light);
-        }
-
-        .about-card .number {
+        .about-label .big-number {
             display: block;
-            margin: 20px 0 12px;
+            margin-top: 26px;
             color: var(--accent);
             font-family: 'Manrope', sans-serif;
-            font-size: 68px;
+            font-size: clamp(45px, 6vw, 72px);
             font-weight: 800;
-            letter-spacing: -4px;
             line-height: 1;
+            letter-spacing: -4px;
         }
 
-        .about-card p:last-child {
+        .about-label p:last-child {
+            margin-top: 14px;
             color: var(--muted);
             font-size: 13px;
         }
 
-        .about-copy {
-            display: flex;
-            align-items: center;
-            background: var(--surface);
-            color: #bac6d6;
-            font-size: 14px;
+        .about-content {
+            padding: 30px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .about-content p {
+            color: #b7c4d5;
+            font-size: 15px;
             line-height: 2;
             white-space: pre-line;
             overflow-wrap: anywhere;
@@ -333,27 +356,27 @@
         .skills-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 13px;
+            gap: 14px;
         }
 
         .skill-card {
             display: flex;
-            gap: 14px;
             align-items: flex-start;
-            min-height: 95px;
-            padding: 21px;
-            background: var(--surface);
+            gap: 15px;
+            min-height: 100px;
+            padding: 22px;
+            background: var(--panel);
             border: 1px solid var(--border);
-            border-radius: 11px;
-            transition: border-color .2s ease, transform .2s ease;
+            border-radius: 12px;
+            transition: border-color 0.2s ease, transform 0.2s ease;
         }
 
         .skill-card:hover {
-            border-color: rgba(145, 185, 232, .5);
             transform: translateY(-3px);
+            border-color: rgba(142, 184, 232, 0.45);
         }
 
-        .skill-index {
+        .skill-number {
             color: var(--accent);
             font-family: 'DM Mono', monospace;
             font-size: 11px;
@@ -367,34 +390,40 @@
 
         .timeline {
             display: grid;
-            gap: 13px;
+            gap: 14px;
         }
 
-        .timeline-item {
+        .timeline-card {
             display: grid;
-            grid-template-columns: 180px minmax(0, 1fr);
-            gap: 25px;
-            padding: 27px;
-            background: var(--surface);
+            grid-template-columns: 190px minmax(0, 1fr);
+            gap: 28px;
+            padding: 28px;
+            background: var(--panel);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 14px;
         }
 
-        .timeline-label {
+        .timeline-marker {
             color: var(--accent);
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .timeline-content h3 {
-            margin-bottom: 7px;
+            margin-bottom: 8px;
             font-family: 'Manrope', sans-serif;
-            font-size: 17px;
-            line-height: 1.6;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.5;
             overflow-wrap: anywhere;
         }
 
         .timeline-content p {
             color: var(--muted);
             font-size: 13px;
+            line-height: 1.9;
             white-space: pre-line;
             overflow-wrap: anywhere;
         }
@@ -402,15 +431,15 @@
         .projects-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 17px;
+            gap: 18px;
         }
 
         .project-card {
             position: relative;
-            min-height: 220px;
-            padding: 27px;
+            min-height: 235px;
+            padding: 30px;
             overflow: hidden;
-            background: linear-gradient(145deg, #17273b, #101927);
+            background: linear-gradient(145deg, var(--panel-light), var(--panel));
             border: 1px solid var(--border);
             border-radius: var(--radius);
         }
@@ -418,36 +447,39 @@
         .project-card::after {
             content: '';
             position: absolute;
-            right: -75px;
+            right: -60px;
             bottom: -100px;
             width: 220px;
             height: 220px;
-            border: 1px solid rgba(145, 185, 232, .12);
+            border: 1px solid rgba(142, 184, 232, 0.12);
             border-radius: 50%;
-            box-shadow: 0 0 0 22px rgba(145, 185, 232, .025),
-                        0 0 0 44px rgba(145, 185, 232, .02);
+            box-shadow: 0 0 0 24px rgba(142, 184, 232, 0.025),
+                        0 0 0 48px rgba(142, 184, 232, 0.02);
             pointer-events: none;
         }
 
-        .project-index {
+        .project-number {
             display: block;
-            margin-bottom: 30px;
+            margin-bottom: 34px;
             color: var(--accent);
         }
 
         .project-card h3 {
             position: relative;
             z-index: 1;
+            margin-bottom: 12px;
             font-family: 'Manrope', sans-serif;
-            font-size: 20px;
-            line-height: 1.5;
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1.45;
+            white-space: pre-line;
             overflow-wrap: anywhere;
         }
 
         .project-card p {
             position: relative;
             z-index: 1;
-            margin-top: 10px;
+            max-width: 460px;
             color: var(--muted);
             font-size: 13px;
             white-space: pre-line;
@@ -455,11 +487,11 @@
         }
 
         .additional-card {
-            padding: 28px;
-            background: var(--surface);
+            padding: 30px;
+            background: var(--panel);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            color: #bac6d6;
+            color: #b7c4d5;
             font-size: 14px;
             line-height: 2;
             white-space: pre-line;
@@ -467,24 +499,25 @@
         }
 
         .contact-section {
-            padding: 80px 0;
-            background: linear-gradient(180deg, var(--bg), #0d1725);
+            padding: 85px 0;
+            background: linear-gradient(180deg, var(--bg), #0c1521);
         }
 
         .contact-panel {
-            padding: clamp(27px, 5vw, 54px);
-            background: var(--surface);
+            padding: clamp(28px, 5vw, 56px);
+            background: var(--panel);
             border: 1px solid var(--border);
-            border-radius: 19px;
+            border-radius: 20px;
         }
 
         .contact-panel h2 {
             max-width: 650px;
-            margin: 17px 0;
+            margin: 18px 0;
             font-family: 'Manrope', sans-serif;
-            font-size: clamp(35px, 5vw, 58px);
-            line-height: 1.12;
-            letter-spacing: -2.4px;
+            font-size: clamp(35px, 5vw, 60px);
+            font-weight: 800;
+            letter-spacing: -2.5px;
+            line-height: 1.1;
         }
 
         .contact-panel h2 span {
@@ -492,40 +525,41 @@
         }
 
         .contact-description {
-            max-width: 510px;
-            margin-bottom: 26px;
+            max-width: 500px;
+            margin-bottom: 28px;
             color: var(--muted);
             font-size: 14px;
         }
 
-        .contact-links,
+        .contact-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
         .social-links {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
+            margin-top: 25px;
         }
 
-        .social-links {
-            margin-top: 22px;
-        }
-
-        .social-links a,
-        .social-links .social-label {
-            padding: 8px 12px;
+        .social-links a {
+            padding: 9px 13px;
+            color: var(--muted);
             border: 1px solid var(--border);
             border-radius: 7px;
-            color: var(--muted);
             font-size: 12px;
-            overflow-wrap: anywhere;
+            transition: color 0.2s ease, border-color 0.2s ease;
         }
 
         .social-links a:hover {
-            border-color: var(--accent);
             color: var(--accent);
+            border-color: var(--accent);
         }
 
-        .footer {
-            padding: 24px 0;
+        .site-footer {
+            padding: 25px 0;
             border-top: 1px solid var(--border);
         }
 
@@ -534,80 +568,98 @@
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 16px;
         }
 
-        .footer p,
-        .footer a {
-            color: #7e8da1;
+        .footer-inner p {
+            color: #78879b;
             font-size: 11px;
         }
 
-        .footer a:hover {
-            color: var(--accent);
+        .back-top {
+            color: var(--accent) !important;
         }
 
-        @media (max-width: 820px) {
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 25px;
+            color: var(--muted);
+            background: var(--panel);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 850px) {
             .hero {
-                grid-template-columns: minmax(0, 1fr) minmax(220px, .75fr);
+                grid-template-columns: 1fr 0.7fr;
                 gap: 30px;
+                min-height: auto;
+                padding: 80px 0;
             }
 
             .hero h1 {
                 letter-spacing: -2.5px;
             }
 
+            .portrait-caption {
+                right: -8px;
+            }
+
             .skills-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .timeline-item {
+            .timeline-card {
                 grid-template-columns: 140px minmax(0, 1fr);
-                gap: 18px;
+                gap: 20px;
             }
         }
 
         @media (max-width: 600px) {
-            .container {
-                width: calc(100% - 32px);
+            .site-shell {
+                width: min(100% - 32px, 1160px);
             }
 
             .nav {
-                min-height: 66px;
+                min-height: 68px;
             }
 
             .nav-links {
-                gap: 13px;
+                gap: 14px;
             }
 
             .nav-links a {
-                font-size: 10px;
+                font-size: 11px;
             }
 
-            .nav-links .nav-button {
+            .nav-links .nav-contact {
                 display: none;
             }
 
             .hero {
                 grid-template-columns: 1fr;
-                gap: 38px;
-                padding-top: 65px;
-                padding-bottom: 65px;
+                gap: 42px;
+                padding: 68px 0;
             }
 
             .hero h1 {
-                font-size: clamp(42px, 12vw, 65px);
-                letter-spacing: -2px;
+                font-size: clamp(43px, 13vw, 68px);
+                letter-spacing: -2.5px;
             }
 
-            .hero-image-wrap {
-                max-width: 290px;
+            .hero-visual {
                 justify-self: center;
-                margin-right: 9px;
+                max-width: 290px;
+                margin-right: 10px;
             }
 
             .section {
-                padding: 68px 0;
+                padding: 70px 0;
+            }
+
+            .section-heading {
+                margin-bottom: 28px;
             }
 
             .about-grid,
@@ -615,34 +667,34 @@
                 grid-template-columns: 1fr;
             }
 
-            .about-card,
-            .about-copy {
+            .about-label,
+            .about-content {
                 padding: 23px;
             }
 
             .skills-grid {
-                gap: 9px;
+                gap: 10px;
             }
 
             .skill-card {
-                min-height: 82px;
-                padding: 14px;
-                gap: 9px;
+                min-height: 85px;
+                padding: 15px;
+                gap: 10px;
             }
 
-            .timeline-item {
+            .timeline-card {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 12px;
                 padding: 22px;
             }
 
             .project-card {
-                min-height: 195px;
-                padding: 23px;
+                min-height: 210px;
+                padding: 24px;
             }
 
             .contact-panel {
-                padding: 25px 21px;
+                padding: 26px 22px;
             }
 
             .contact-panel h2 {
@@ -717,8 +769,8 @@
             : [];
     @endphp
 
-    <header class="header" id="top">
-        <div class="container nav">
+    <header class="site-header" id="top">
+        <div class="site-shell nav">
             <a class="brand" href="#top">
                 {{ $portfolio->full_name }}<span>.</span>
             </a>
@@ -727,13 +779,13 @@
                 <a href="#about">About</a>
                 <a href="#skills">Skills</a>
                 <a href="#work">Work</a>
-                <a href="#contact" class="nav-button">Contact ↗</a>
+                <a href="#contact" class="nav-contact">Contact ↗</a>
             </nav>
         </div>
     </header>
 
     <main>
-        <section class="container hero">
+        <section class="site-shell hero">
             <div class="hero-copy">
                 <p class="eyebrow mono">Personal Portfolio</p>
 
@@ -742,68 +794,77 @@
                     <span>Portfolio.</span>
                 </h1>
 
-                <p class="hero-description">{{ $portfolio->about_me ?: 'Welcome to my portfolio. Explore my background, skills, and work.' }}</p>
+                <p class="hero-description">{{ $portfolio->about_me ?: 'Welcome to my personal portfolio. Explore my background, skills, and work.' }}</p>
 
                 <div class="hero-actions">
-                    <a href="#work" class="button button-primary">Explore my work ↗</a>
-                    <a href="#contact" class="button button-secondary">Get in touch</a>
+                    <a class="button button-primary" href="#work">
+                        Explore my work <span aria-hidden="true">↗</span>
+                    </a>
+
+                    <a class="button button-secondary" href="#contact">
+                        Get in touch
+                    </a>
                 </div>
             </div>
 
-            <div class="hero-image-wrap">
-                <div class="hero-image">
+            <div class="hero-visual">
+                <div class="portrait-frame">
                     @if ($imageUrl)
                         <img src="{{ $imageUrl }}" alt="Portrait of {{ $portfolio->full_name }}">
                     @else
-                        <div class="image-placeholder">
+                        <div class="portrait-placeholder" aria-label="Profile initials">
                             {{ $initials ?: 'ME' }}
                         </div>
                     @endif
                 </div>
 
-                <div class="image-label">
+                <div class="portrait-caption">
                     <p class="mono">Portfolio / 01</p>
                     <p>{{ $portfolio->full_name }}</p>
                 </div>
             </div>
         </section>
 
-        <section class="container section" id="about">
+        <section class="site-shell section" id="about">
             <div class="section-heading">
                 <div>
-                    <p class="eyebrow mono">Introduction</p>
-                    <h2>A little about me.</h2>
+                    <p class="eyebrow mono">A little about me</p>
+                    <h2>Beyond the introduction.</h2>
                 </div>
-                <span class="section-number mono">01 / ABOUT</span>
+
+                <span class="section-index mono">01 / ABOUT</span>
             </div>
 
             <div class="about-grid">
-                <div class="about-card">
-                    <p class="mono">Behind the portfolio</p>
-                    <span class="number">01.</span>
-                    <p>My background, interests, and journey.</p>
+                <div class="about-label">
+                    <span class="mono">The person behind the work</span>
+
+                    <span class="big-number">01<span style="color: var(--text)">.</span></span>
+
+                    <p>Background, interests, and personal journey.</p>
                 </div>
 
-                <div class="about-copy">
-                    {{ $portfolio->about_me ?: 'My personal introduction will appear here.' }}
+                <div class="about-content">
+                    <p>{{ $portfolio->about_me ?: 'My personal and professional journey will be shared here.' }}</p>
                 </div>
             </div>
         </section>
 
         @if (!empty($skills))
-            <section class="container section" id="skills">
+            <section class="site-shell section" id="skills">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow mono">What I bring</p>
+                        <p class="eyebrow mono">Capabilities</p>
                         <h2>Skills &amp; strengths.</h2>
                     </div>
-                    <span class="section-number mono">02 / SKILLS</span>
+
+                    <span class="section-index mono">02 / SKILLS</span>
                 </div>
 
                 <div class="skills-grid">
                     @foreach ($skills as $index => $skill)
                         <article class="skill-card">
-                            <span class="skill-index">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                            <span class="skill-number">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
                             <p>{{ trim($skill) }}</p>
                         </article>
                     @endforeach
@@ -812,20 +873,21 @@
         @endif
 
         @if (!empty($educationItems))
-            <section class="container section" id="education">
+            <section class="site-shell section" id="education">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow mono">Academic background</p>
+                        <p class="eyebrow mono">Academic journey</p>
                         <h2>Education.</h2>
                     </div>
-                    <span class="section-number mono">03 / EDUCATION</span>
+
+                    <span class="section-index mono">03 / EDUCATION</span>
                 </div>
 
                 <div class="timeline">
                     @foreach ($educationItems as $index => $education)
-                        <article class="timeline-item">
-                            <div class="timeline-label mono">
-                                ENTRY / {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                        <article class="timeline-card">
+                            <div class="timeline-marker">
+                                Entry {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
                             </div>
 
                             <div class="timeline-content">
@@ -838,20 +900,21 @@
         @endif
 
         @if (!empty($experienceItems))
-            <section class="container section" id="experience">
+            <section class="site-shell section" id="experience">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow mono">Professional background</p>
-                        <h2>Experience.</h2>
+                        <p class="eyebrow mono">Experience</p>
+                        <h2>Where I've worked.</h2>
                     </div>
-                    <span class="section-number mono">04 / EXPERIENCE</span>
+
+                    <span class="section-index mono">04 / EXPERIENCE</span>
                 </div>
 
                 <div class="timeline">
                     @foreach ($experienceItems as $index => $experience)
-                        <article class="timeline-item">
-                            <div class="timeline-label mono">
-                                EXPERIENCE / {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                        <article class="timeline-card">
+                            <div class="timeline-marker">
+                                Experience {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
                             </div>
 
                             <div class="timeline-content">
@@ -864,21 +927,23 @@
         @endif
 
         @if (!empty($projectItems))
-            <section class="container section" id="work">
+            <section class="site-shell section" id="work">
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow mono">Selected work</p>
                         <h2>Projects &amp; creations.</h2>
                     </div>
-                    <span class="section-number mono">05 / PROJECTS</span>
+
+                    <span class="section-index mono">05 / PROJECTS</span>
                 </div>
 
                 <div class="projects-grid">
                     @foreach ($projectItems as $index => $project)
                         <article class="project-card">
-                            <span class="project-index mono">
+                            <span class="project-number mono">
                                 PROJECT / {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
                             </span>
+
                             <h3>{{ trim($project) }}</h3>
                         </article>
                     @endforeach
@@ -887,13 +952,14 @@
         @endif
 
         @if ($portfolio->additional_info)
-            <section class="container section" id="additional">
+            <section class="site-shell section" id="additional">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow mono">More details</p>
+                        <p class="eyebrow mono">More to know</p>
                         <h2>Additional information.</h2>
                     </div>
-                    <span class="section-number mono">06 / DETAILS</span>
+
+                    <span class="section-index mono">06 / DETAILS</span>
                 </div>
 
                 <div class="additional-card">
@@ -903,18 +969,18 @@
         @endif
 
         <section class="contact-section" id="contact">
-            <div class="container">
+            <div class="site-shell">
                 <div class="contact-panel">
-                    <p class="eyebrow mono">Let's connect</p>
+                    <p class="eyebrow mono">Get in touch</p>
 
                     <h2>
-                        Have something
-                        <span>in mind?</span>
+                        Let's start a
+                        <span>conversation.</span>
                     </h2>
 
                     <p class="contact-description">
-                        Thank you for visiting my portfolio.
-                        Feel free to reach out using the contact details below.
+                        Thank you for taking the time to explore my portfolio.
+                        Feel free to reach out through the contact details below.
                     </p>
 
                     <div class="contact-links">
@@ -926,7 +992,7 @@
 
                         @if ($websiteUrl)
                             <a class="button button-secondary" href="{{ $websiteUrl }}" target="_blank" rel="noopener noreferrer">
-                                Website ↗
+                                Personal website ↗
                             </a>
                         @endif
 
@@ -945,14 +1011,16 @@
 
                     @if ($portfolio->address)
                         <div class="social-links">
-                            <span class="social-label">Location: {{ $portfolio->address }}</span>
+                            <span class="mono" style="color: var(--muted); padding: 9px 0;">
+                                Location: {{ $portfolio->address }}
+                            </span>
                         </div>
                     @endif
 
                     @if (!empty($socialLinks))
                         <div class="social-links">
                             @foreach ($socialLinks as $socialLink)
-                                <span class="social-label">{{ trim($socialLink) }}</span>
+                                <span>{{ trim($socialLink) }}</span>
                             @endforeach
                         </div>
                     @endif
@@ -961,11 +1029,15 @@
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="container footer-inner">
+    <footer class="site-footer">
+        <div class="site-shell footer-inner">
             <p>© {{ date('Y') }} {{ $portfolio->full_name }}. All rights reserved.</p>
-            <a href="#top" class="mono">Back to top ↑</a>
-            <a href="{{ route('home') }}" class="mono">Create your portfolio</a>
+
+            <a href="#top" class="mono back-top">Back to top ↑</a>
+
+            <a href="{{ route('home') }}" class="mono" style="color: var(--muted);">
+                Create your portfolio
+            </a>
         </div>
     </footer>
 </body>
