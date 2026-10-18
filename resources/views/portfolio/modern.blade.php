@@ -762,7 +762,7 @@
                 </div>
 
                 <div class="image-label">
-                    <p class="mono">Portfolio / 01</p>
+                   
                     <p>{{ $portfolio->full_name }}</p>
                 </div>
             </div>
