@@ -196,28 +196,23 @@ class PortfolioController extends Controller
      * Download the generated portfolio as an HTML file.
      */
     public function download($id)
-    {
-        $portfolio = Portfolio::findOrFail($id);
+{
+    $portfolio = Portfolio::findOrFail($id);
 
-        $view = $this->getTemplateView($portfolio);
+    $view = $this->getTemplateView($portfolio);
 
-        $html = view($view, compact('portfolio'))->render();
+    $filename = Str::slug(
+        $portfolio->full_name ?: 'portfolio'
+    ) . '-portfolio.pdf';
 
-        $filename = Str::slug(
-            $portfolio->full_name ?: 'portfolio'
-        ) . '-portfolio.html';
+    $pdf = Pdf::loadView($view, compact('portfolio'))
+        ->setPaper('a4', 'portrait')
+        ->setOptions([
+            'isRemoteEnabled' => true,
+        ]);
 
-        return response()->streamDownload(
-            function () use ($html) {
-                echo $html;
-            },
-            $filename,
-            [
-                'Content-Type' => 'text/html; charset=UTF-8',
-            ]
-        );
-    }
-
+    return $pdf->download($filename);
+}
     /**
      * Display the edit form.
      */
