@@ -1,51 +1,27 @@
 
-@php
-    $name = $portfolio->full_name ?: 'Your Name';
-    $initial = strtoupper(substr($name, 0, 1));
-
-    $skills = preg_split(
-        '/[,;\n]+/',
-        (string) ($portfolio->skills ?? ''),
-        -1,
-        PREG_SPLIT_NO_EMPTY
-    );
-
-    $skills = array_map('trim', $skills);
-
-    $profileImage = !empty($portfolio->profile_picture)
-        ? asset('storage/' . $portfolio->profile_picture)
-        : null;
-
-    $accent = $portfolio->accent_color ?? '#a84438';
-
-    $about = $portfolio->about_me ?? '';
-    $education = $portfolio->educational_background ?? '';
-    $experience = $portfolio->work_experience ?? '';
-    $projects = $portfolio->projects ?? '';
-    $additional = $portfolio->additional_info ?? '';
-@endphp
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $name }} | Portfolio</title>
+    <title>{{ $portfolio->full_name }} | Modern Portfolio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --sage: #b9c8a7;
-            --sage-light: #dce4cf;
-            --forest: #243c30;
-            --forest-light: #304b3a;
-            --paper: #fff9e9;
-            --paper-dark: #eee4cd;
-            --ink: #40382d;
-            --muted: #756b5c;
-            --red: {{ $accent }};
-            --olive: #71804a;
-            --shadow: 5px 7px 0 rgba(35, 49, 35, 0.14);
+            --bg: #090e17;
+            --surface: #101927;
+            --surface-light: #152338;
+            --border: rgba(177, 201, 230, 0.14);
+            --text: #edf3fb;
+            --muted: #9baabe;
+            --accent: #91b9e8;
+            --accent-soft: rgba(145, 185, 232, 0.1);
+            --radius: 16px;
         }
 
         * {
@@ -56,1162 +32,941 @@
 
         html {
             scroll-behavior: smooth;
+            scroll-padding-top: 85px;
         }
 
         body {
-            min-height: 100vh;
-            color: var(--ink);
-            background: var(--forest);
-            font-family: "Trebuchet MS", Arial, sans-serif;
-            line-height: 1.65;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
         }
 
-<<<<<<< HEAD
         a {
             color: inherit;
-            overflow-wrap: anywhere;
+            text-decoration: none;
         }
 
-        .scrapbook {
-            max-width: 1440px;
-            margin: 0 auto;
-            overflow: hidden;
-            background:
-                radial-gradient(
-                    circle at 15% 15%,
-                    rgba(255, 255, 255, 0.23) 0 1px,
-                    transparent 2px
-                ),
-                var(--sage);
-            background-size: 17px 17px;
-=======
-        /* HEADER */
+        img {
+            display: block;
+            max-width: 100%;
+        }
 
-        .profile {
-            display: grid;
-            grid-template-columns: 1fr 180px;
-            gap: 50px;
-            align-items: center;
+        ::selection {
             background: var(--accent);
-            color: #ffffff;
-            padding: 55px;
-            border-radius: 12px;
-            margin-bottom: 35px;
+            color: var(--bg);
         }
 
-        .profile-picture {
-            width: 180px;
-            height: 180px;
-            border-radius: 12px;
-            background: var(--accent-light);
-            overflow: hidden;
-            order: 2;
->>>>>>> d29c88f (Update portfolio scrapbook design)
+        .container {
+            width: min(1120px, calc(100% - 48px));
+            margin: 0 auto;
         }
 
-        /* Top navigation */
+        .mono {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
 
-        .topbar {
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: var(--accent);
+        }
+
+        .eyebrow::before {
+            content: '';
+            width: 23px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(9, 14, 23, 0.92);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(16px);
+        }
+
+        .nav {
+            min-height: 74px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 20px;
-            padding: 22px 7%;
         }
 
         .brand {
-            color: var(--forest);
-            font-family: Georgia, serif;
-            font-size: 1.15rem;
-            font-weight: bold;
-            letter-spacing: 1px;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            font-size: 17px;
+            letter-spacing: -0.6px;
         }
 
-        .navigation {
+        .brand span {
+            color: var(--accent);
+        }
+
+        .nav-links {
             display: flex;
-            flex-wrap: wrap;
-            gap: 24px;
+            align-items: center;
+            gap: 26px;
         }
 
-        .navigation a {
-            color: var(--forest);
-            font-size: 0.77rem;
-            font-weight: bold;
-            letter-spacing: 1.5px;
-            text-decoration: none;
-            text-transform: uppercase;
+        .nav-links a {
+            color: var(--muted);
+            font-size: 12px;
+            transition: color .2s ease;
         }
 
-        .navigation a:hover {
-            color: var(--red);
+        .nav-links a:hover {
+            color: var(--text);
         }
 
-        /* Main introduction */
+        .nav-links .nav-button {
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 8px 14px;
+        }
 
         .hero {
-            position: relative;
             display: grid;
-            grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.5fr);
-            gap: 65px;
+            grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr);
+            gap: 70px;
             align-items: center;
-            padding: 65px 9% 105px;
-            background: var(--paper);
-            clip-path: polygon(
-                0 0, 100% 0, 100% 96%,
-                96% 98%, 91% 97%, 85% 99%,
-                79% 97%, 72% 99%, 65% 97%,
-                57% 99%, 49% 97%, 41% 99%,
-                32% 97%, 23% 99%, 15% 97%,
-                8% 99%, 0 97%
-            );
+            min-height: 610px;
+            padding-top: 85px;
+            padding-bottom: 85px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .hero::before {
-            content: "*";
-            position: absolute;
-            top: 35px;
-            right: 8%;
-            color: var(--red);
-            font-family: Georgia, serif;
-            font-size: 5rem;
-            transform: rotate(15deg);
-        }
-
-        .hero::after {
-            content: "✳";
-            position: absolute;
-            right: 12%;
-            bottom: 45px;
-            color: var(--olive);
-            font-size: 2rem;
-            transform: rotate(-12deg);
-        }
-
-        .profile-side {
-            position: relative;
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .polaroid {
-            position: relative;
-            padding: 13px 13px 43px;
-            background: #fffdf6;
-            box-shadow: var(--shadow);
-            transform: rotate(-5deg);
-        }
-
-        .polaroid::after {
-            content: "";
-            position: absolute;
-            top: -12px;
-            right: 28px;
-            width: 22px;
-            height: 54px;
-            border: 3px solid #a6aaa3;
-            border-radius: 5px;
-            transform: rotate(12deg);
-            z-index: 2;
-        }
-
-        .portrait {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            aspect-ratio: 4 / 5;
-            overflow: hidden;
-            background:
-                radial-gradient(
-                    circle at 50% 35%,
-                    #d6d9bd 0 20%,
-                    transparent 21%
-                ),
-                linear-gradient(145deg, #d9e0cb, #9cad8d);
-            color: var(--forest);
-            font-family: Georgia, serif;
-            font-size: 5rem;
-        }
-
-        .portrait img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-<<<<<<< HEAD
-        .polaroid-caption {
-            position: absolute;
-            right: 0;
-            bottom: 8px;
-            left: 0;
-            color: var(--muted);
-            font-family: Georgia, serif;
-            font-size: 0.9rem;
-            text-align: center;
-=======
-        .profile-content {
-            order: 1;
->>>>>>> d29c88f (Update portfolio scrapbook design)
-        }
-
-        .contact-card {
-            position: relative;
-            z-index: 3;
-            width: 94%;
-            margin: -10px auto 0;
-            padding: 22px;
-            background: #f2e5c9;
-            box-shadow: 3px 5px 0 rgba(50, 43, 30, 0.15);
-            transform: rotate(2deg);
-        }
-
-        .contact-card h2 {
-            margin-bottom: 12px;
-            color: var(--red);
-            font-family: Georgia, serif;
-            font-size: 1.35rem;
-        }
-
-        .contact-card p {
-            margin: 7px 0;
-            font-size: 0.84rem;
-            overflow-wrap: anywhere;
-        }
-
-        .contact-label {
-            color: var(--muted);
-            font-size: 0.7rem;
-<<<<<<< HEAD
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .portfolio-link {
-            display: inline-block;
-            margin-top: 12px;
-            padding: 7px 12px;
-            border: 1px dashed var(--red);
-            color: var(--red);
-            font-size: 0.76rem;
-            font-weight: bold;
-            text-decoration: none;
-=======
-            font-weight: 700;
-            letter-spacing: 2px;
-            opacity: 0.75;
-            margin-bottom: 12px;
-        }
-
-        .profile-name {
-            font-size: clamp(2.3rem, 5vw, 4.5rem);
-            line-height: 1;
-            font-weight: 800;
-            margin-bottom: 18px;
->>>>>>> d29c88f (Update portfolio scrapbook design)
-        }
-
-        .intro-copy {
-            position: relative;
-            z-index: 1;
-        }
-
-        .eyebrow {
-            margin-bottom: 13px;
-            color: var(--olive);
-            font-size: 0.75rem;
-            font-weight: bold;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .intro-title {
-            position: relative;
-            margin-bottom: 25px;
-            padding-left: 30px;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: clamp(2.7rem, 5.5vw, 5.1rem);
-            font-weight: normal;
-            line-height: 1.1;
-            overflow-wrap: anywhere;
-        }
-
-        .intro-title::before {
-            content: "{";
-            position: absolute;
-            top: -10px;
-            left: -14px;
-            color: var(--red);
-            font-size: 1.25em;
-            font-weight: bold;
-        }
-
-<<<<<<< HEAD
-        .intro-title span {
-            color: var(--red);
-            font-style: italic;
-=======
-        /* SECTIONS */
-
-        .section {
-            margin-bottom: 35px;
-            padding: 35px;
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 12px;
->>>>>>> d29c88f (Update portfolio scrapbook design)
-        }
-
-        .intro-description {
-            max-width: 620px;
-            color: #5d5548;
-            font-size: 1rem;
-            line-height: 1.95;
-            white-space: pre-line;
-            overflow-wrap: anywhere;
-        }
-
-<<<<<<< HEAD
-        .intro-details {
-=======
-        /* GRID */
-
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 35px;
-        }
-
-        .two-column .section {
-            margin-bottom: 0;
-        }
-
-        /* SKILLS */
-
-        .skills-list {
->>>>>>> d29c88f (Update portfolio scrapbook design)
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 24px;
-        }
-
-        .detail-tag {
-            padding: 7px 13px;
-            border: 1px solid #d8cbb2;
-            background: #fffdf6;
-            font-size: 0.77rem;
-            transform: rotate(-1deg);
-        }
-
-<<<<<<< HEAD
-        /* Lower scrapbook area */
-
-        .scrapbook-content {
-            position: relative;
-            display: grid;
-            grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
-            gap: 45px;
-            align-items: start;
-            padding: 70px 8% 90px;
-            background:
-                radial-gradient(
-                    circle at 10% 20%,
-                    rgba(255, 255, 255, 0.035) 0 1px,
-                    transparent 2px
-                ),
-                var(--forest);
-            background-size: 13px 13px;
-        }
-
-        .paper {
-            position: relative;
+        .hero-copy {
             min-width: 0;
-            padding: 35px 30px;
-            background:
-                radial-gradient(
-                    circle at 12% 17%,
-                    rgba(111, 87, 48, 0.055) 0 1px,
-                    transparent 2px
-                ),
-                var(--paper);
-            background-size: 12px 12px;
-            box-shadow: 6px 8px 0 rgba(0, 0, 0, 0.15);
         }
 
-        .education-paper {
-            transform: rotate(-1.5deg);
-        }
-=======
-        /* PROJECTS */
-
-        .project-content {
-            padding: 20px;
-            border-left: 4px solid var(--accent-muted);
-            background: #f7f8f9;
-        }
-
-        /* SOCIAL */
->>>>>>> d29c88f (Update portfolio scrapbook design)
-
-        .experience-paper {
-            transform: rotate(1deg);
-        }
-
-        .paper::before {
-            content: "";
-            position: absolute;
-            top: -7px;
-            left: 15%;
-            width: 95px;
-            height: 19px;
-            background: rgba(221, 215, 178, 0.75);
-            transform: rotate(-3deg);
-        }
-
-        .ribbon {
-            display: inline-block;
-            margin: -5px 0 27px -39px;
-            padding: 9px 28px 9px 39px;
-            background: var(--red);
-            color: white;
-            font-family: Georgia, serif;
-            font-size: 1.45rem;
-            box-shadow: 3px 4px 0 rgba(64, 47, 32, 0.15);
-        }
-
-        .ribbon::after {
-            content: "";
-            display: block;
-            position: absolute;
-            width: 0;
-            height: 0;
-            margin-top: 8px;
-            margin-left: -28px;
-            border-top: 9px solid #702e28;
-            border-left: 9px solid transparent;
-        }
-
-        .ribbon.green {
-            background: var(--olive);
-        }
-
-        .ribbon.green::after {
-            border-top-color: #4d5c32;
-        }
-
-        .ribbon.brown {
-            background: #65503c;
-        }
-
-        .section-heading {
-            margin: 30px 0 15px;
-            color: var(--forest);
-            font-family: Georgia, serif;
-            font-size: 1.25rem;
-        }
-
-        .section-heading:first-of-type {
-            margin-top: 0;
-        }
-
-        .paper-text {
-            color: #5d5548;
-            font-size: 0.91rem;
-            line-height: 1.85;
-            white-space: pre-line;
+        .hero h1 {
+            margin: 26px 0;
+            font-family: 'Manrope', sans-serif;
+            font-size: clamp(45px, 6.5vw, 78px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -3.8px;
             overflow-wrap: anywhere;
         }
 
-        .underlined-detail {
-            margin-top: 10px;
-            color: var(--red);
-            font-size: 0.88rem;
-            font-style: italic;
-            text-decoration: underline;
-            text-decoration-thickness: 1px;
-            text-underline-offset: 4px;
-            white-space: pre-line;
-        }
-
-        .skill-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 13px;
-            margin: 22px 0 35px;
-        }
-
-        .skill-tag {
-            padding: 10px 13px;
-            border: 1px solid #e0d3b9;
-            background: #fffdf5;
-            color: var(--forest);
-            font-size: 0.79rem;
-            font-weight: bold;
-            box-shadow: 2px 3px 0 rgba(50, 43, 30, 0.08);
-        }
-
-        .skill-tag:nth-child(3n + 1) {
-            transform: rotate(-3deg);
-        }
-
-        .skill-tag:nth-child(3n + 2) {
-            transform: rotate(2deg);
-        }
-
-        .skill-tag:nth-child(3n) {
-            transform: rotate(-1deg);
-        }
-
-        .skill-tag:first-child::before {
-            content: "* ";
-            color: var(--red);
-            font-size: 1.15rem;
-        }
-
-        .software-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .software-item {
-            text-align: center;
-        }
-
-        .software-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            aspect-ratio: 1;
-            border: 2px solid rgba(255, 255, 255, 0.22);
-            color: white;
-            font-size: clamp(1rem, 2vw, 1.65rem);
-            font-weight: bold;
-            box-shadow: 2px 3px 0 rgba(50, 43, 30, 0.13);
-        }
-
-        .photoshop {
-            background: #54264e;
-        }
-
-        .illustrator {
-            background: #8c4925;
-        }
-
-        .aftereffects {
-            background: #594b91;
-        }
-
-        .premiere {
-            background: #486b45;
-        }
-
-        .software-name {
+        .hero h1 span {
             display: block;
-            margin-top: 8px;
+            color: var(--accent);
+        }
+
+        .hero-description {
+            max-width: 510px;
             color: var(--muted);
-            font-size: 0.68rem;
-            line-height: 1.4;
-        }
-
-        /* Experience and projects */
-
-        .timeline {
-            position: relative;
-            margin-top: 10px;
-            padding-left: 22px;
-            border-left: 2px dashed #b8b99b;
-        }
-
-        .timeline-entry {
-            position: relative;
-            margin-bottom: 30px;
-        }
-
-        .timeline-entry:last-child {
-            margin-bottom: 0;
-        }
-
-        .timeline-entry::before {
-            content: "";
-            position: absolute;
-            top: 7px;
-            left: -29px;
-            width: 12px;
-            height: 12px;
-            border: 3px solid var(--paper);
-            border-radius: 50%;
-            background: var(--olive);
-            box-shadow: 0 0 0 1px var(--olive);
-        }
-
-        .entry-title {
-            color: var(--red);
-            font-family: Georgia, serif;
-            font-size: 1.15rem;
-            font-weight: bold;
-            overflow-wrap: anywhere;
-        }
-
-        .entry-date {
-            display: inline-block;
-            margin: 4px 0 8px;
-            color: var(--olive);
-            font-size: 0.75rem;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        .entry-description {
-            color: #62594c;
-            font-size: 0.88rem;
-            line-height: 1.85;
+            font-size: 14px;
+            line-height: 2;
             white-space: pre-line;
             overflow-wrap: anywhere;
         }
 
-        .text-block {
-            padding: 18px;
-            border-left: 3px solid var(--olive);
-            background: rgba(225, 219, 198, 0.38);
-            color: #62594c;
-            font-size: 0.9rem;
-            line-height: 1.85;
-            white-space: pre-line;
-            overflow-wrap: anywhere;
-        }
-
-        .extra-section {
-            margin-top: 35px;
-        }
-
-        .extra-section .section-heading {
-            margin-top: 0;
-        }
-
-        .social-links {
+        .hero-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
-            margin-top: 14px;
+            margin-top: 30px;
         }
 
-        .social-link {
-            color: var(--red);
-            font-size: 0.83rem;
-            font-weight: bold;
-            text-decoration-thickness: 1px;
-            text-underline-offset: 4px;
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 12px 18px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: transform .2s ease, background .2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .button-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #0a1422;
+        }
+
+        .button-secondary {
+            color: var(--text);
+        }
+
+        .hero-image-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+            justify-self: end;
+        }
+
+        .hero-image {
+            aspect-ratio: 4 / 5;
+            padding: 11px;
+            background: linear-gradient(145deg, #223751, #101927);
+            border: 1px solid rgba(145, 185, 232, .35);
+            border-radius: 180px 180px 12px 12px;
+        }
+
+        .hero-image img,
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 170px 170px 6px 6px;
+        }
+
+        .image-placeholder {
+            display: grid;
+            place-items: center;
+            background: var(--surface-light);
+            color: var(--accent);
+            font-family: 'Manrope', sans-serif;
+            font-size: 82px;
+            font-weight: 800;
+        }
+
+        .image-label {
+            position: absolute;
+            right: -18px;
+            bottom: 26px;
+            padding: 13px 17px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, .25);
+        }
+
+        .image-label .mono {
+            color: var(--accent);
+        }
+
+        .image-label p:last-child {
+            margin-top: 3px;
+            font-size: 12px;
+        }
+
+        .section {
+            padding: 90px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 24px;
+            margin-bottom: 35px;
+        }
+
+        .section-heading h2 {
+            margin-top: 12px;
+            font-family: 'Manrope', sans-serif;
+            font-size: clamp(29px, 4vw, 43px);
+            line-height: 1.2;
+            letter-spacing: -1.8px;
+        }
+
+        .section-number {
+            flex-shrink: 0;
+            color: #64758c;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: .75fr 1.25fr;
+            gap: 18px;
+        }
+
+        .about-card,
+        .about-copy {
+            padding: 28px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .about-card {
+            background: var(--surface-light);
+        }
+
+        .about-card .number {
+            display: block;
+            margin: 20px 0 12px;
+            color: var(--accent);
+            font-family: 'Manrope', sans-serif;
+            font-size: 68px;
+            font-weight: 800;
+            letter-spacing: -4px;
+            line-height: 1;
+        }
+
+        .about-card p:last-child {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .about-copy {
+            display: flex;
+            align-items: center;
+            background: var(--surface);
+            color: #bac6d6;
+            font-size: 14px;
+            line-height: 2;
+            white-space: pre-line;
             overflow-wrap: anywhere;
         }
 
-<<<<<<< HEAD
-        /* Footer */
-=======
-        .social-link:hover {
-            background: var(--accent);
-            color: #ffffff;
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 13px;
         }
 
-        /* FOOTER */
->>>>>>> d29c88f (Update portfolio scrapbook design)
+        .skill-card {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            min-height: 95px;
+            padding: 21px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            transition: border-color .2s ease, transform .2s ease;
+        }
+
+        .skill-card:hover {
+            border-color: rgba(145, 185, 232, .5);
+            transform: translateY(-3px);
+        }
+
+        .skill-index {
+            color: var(--accent);
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+        }
+
+        .skill-card p {
+            font-size: 13px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .timeline {
+            display: grid;
+            gap: 13px;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 180px minmax(0, 1fr);
+            gap: 25px;
+            padding: 27px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .timeline-label {
+            color: var(--accent);
+        }
+
+        .timeline-content h3 {
+            margin-bottom: 7px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 17px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .timeline-content p {
+            color: var(--muted);
+            font-size: 13px;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .project-card {
+            position: relative;
+            min-height: 220px;
+            padding: 27px;
+            overflow: hidden;
+            background: linear-gradient(145deg, #17273b, #101927);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .project-card::after {
+            content: '';
+            position: absolute;
+            right: -75px;
+            bottom: -100px;
+            width: 220px;
+            height: 220px;
+            border: 1px solid rgba(145, 185, 232, .12);
+            border-radius: 50%;
+            box-shadow: 0 0 0 22px rgba(145, 185, 232, .025),
+                        0 0 0 44px rgba(145, 185, 232, .02);
+            pointer-events: none;
+        }
+
+        .project-index {
+            display: block;
+            margin-bottom: 30px;
+            color: var(--accent);
+        }
+
+        .project-card h3 {
+            position: relative;
+            z-index: 1;
+            font-family: 'Manrope', sans-serif;
+            font-size: 20px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .project-card p {
+            position: relative;
+            z-index: 1;
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 13px;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
+
+        .additional-card {
+            padding: 28px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: #bac6d6;
+            font-size: 14px;
+            line-height: 2;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+        }
+
+        .contact-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, var(--bg), #0d1725);
+        }
+
+        .contact-panel {
+            padding: clamp(27px, 5vw, 54px);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 19px;
+        }
+
+        .contact-panel h2 {
+            max-width: 650px;
+            margin: 17px 0;
+            font-family: 'Manrope', sans-serif;
+            font-size: clamp(35px, 5vw, 58px);
+            line-height: 1.12;
+            letter-spacing: -2.4px;
+        }
+
+        .contact-panel h2 span {
+            color: var(--accent);
+        }
+
+        .contact-description {
+            max-width: 510px;
+            margin-bottom: 26px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .contact-links,
+        .social-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .social-links {
+            margin-top: 22px;
+        }
+
+        .social-links a,
+        .social-links .social-label {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--muted);
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .social-links a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
 
         .footer {
-            padding: 25px 20px;
-            background: #1b3025;
-            color: #d8dfcf;
-            font-size: 0.76rem;
-            letter-spacing: 1px;
-            text-align: center;
+            padding: 24px 0;
+            border-top: 1px solid var(--border);
         }
 
-        .footer span {
-            color: #d99b86;
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-<<<<<<< HEAD
-        /* Responsive layout */
+        .footer p,
+        .footer a {
+            color: #7e8da1;
+            font-size: 11px;
+        }
 
-        @media (max-width: 850px) {
+        .footer a:hover {
+            color: var(--accent);
+        }
+
+        @media (max-width: 820px) {
             .hero {
-                grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-                gap: 35px;
-                padding-right: 7%;
-                padding-left: 7%;
-            }
-
-            .scrapbook-content {
+                grid-template-columns: minmax(0, 1fr) minmax(220px, .75fr);
                 gap: 30px;
-                padding-right: 5%;
-                padding-left: 5%;
             }
 
-            .paper {
-                padding: 30px 23px;
-=======
-        /* STANDARD */
-
-        .layout-standard .section {
-            box-shadow: 0 5px 20px rgba(20, 30, 40, 0.04);
-        }
-
-        /* CARDS */
-
-        .layout-cards .section {
-            box-shadow: 0 10px 30px rgba(20, 30, 40, 0.08);
-            border: none;
-        }
-
-        .layout-cards .profile {
-            box-shadow: 0 12px 35px rgba(20, 30, 40, 0.15);
-        }
-
-        .layout-cards .social-section {
-            box-shadow: 0 10px 30px rgba(20, 30, 40, 0.08);
-        }
-
-        /* EDITORIAL */
-
-        .layout-editorial {
-            max-width: 1050px;
-        }
-
-        .layout-editorial .profile {
-            grid-template-columns: 180px 1fr;
-        }
-
-        .layout-editorial .profile-picture {
-            order: 1;
-        }
-
-        .layout-editorial .profile-content {
-            order: 2;
-        }
-
-        .layout-editorial .two-column {
-            grid-template-columns: 1.2fr 0.8fr;
-        }
-
-        .layout-editorial .section {
-            border-radius: 0;
-            border-left: 5px solid var(--accent);
-        }
-
-        /* RESPONSIVE */
-
-        @media (max-width: 750px) {
-
-            .portfolio {
-                width: 94%;
-                margin: 25px auto;
-                padding: 25px;
+            .hero h1 {
+                letter-spacing: -2.5px;
             }
 
-            .profile,
-            .layout-editorial .profile {
+            .skills-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .timeline-item {
+                grid-template-columns: 140px minmax(0, 1fr);
+                gap: 18px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: calc(100% - 32px);
+            }
+
+            .nav {
+                min-height: 66px;
+            }
+
+            .nav-links {
+                gap: 13px;
+            }
+
+            .nav-links a {
+                font-size: 10px;
+            }
+
+            .nav-links .nav-button {
+                display: none;
+            }
+
+            .hero {
                 grid-template-columns: 1fr;
-                text-align: center;
-                justify-items: center;
-                padding: 35px 25px;
+                gap: 38px;
+                padding-top: 65px;
+                padding-bottom: 65px;
             }
 
-            .profile-picture,
-            .layout-editorial .profile-picture {
-                order: 1;
-                width: 150px;
-                height: 150px;
->>>>>>> d29c88f (Update portfolio scrapbook design)
+            .hero h1 {
+                font-size: clamp(42px, 12vw, 65px);
+                letter-spacing: -2px;
             }
 
-            .ribbon {
-                margin-left: -30px;
-                padding-left: 30px;
-            }
-        }
-
-<<<<<<< HEAD
-        @media (max-width: 650px) {
-            .topbar {
-                align-items: flex-start;
-=======
-            .contact {
-                justify-content: center;
-            }
-
-            .two-column,
-            .layout-editorial .two-column {
-                grid-template-columns: 1fr;
+            .hero-image-wrap {
+                max-width: 290px;
+                justify-self: center;
+                margin-right: 9px;
             }
 
             .section {
-                padding: 28px;
+                padding: 68px 0;
             }
 
-            .footer {
->>>>>>> d29c88f (Update portfolio scrapbook design)
-                flex-direction: column;
-                padding: 22px 6%;
-            }
-
-            .navigation {
-                gap: 13px 18px;
-            }
-
-            .navigation a {
-                font-size: 0.69rem;
-            }
-
-            .hero {
+            .about-grid,
+            .projects-grid {
                 grid-template-columns: 1fr;
-                gap: 45px;
-                padding: 45px 7% 85px;
-                clip-path: polygon(
-                    0 0, 100% 0, 100% 98%,
-                    80% 99%, 60% 98%, 40% 99%,
-                    20% 98%, 0 99%
-                );
             }
 
-            .profile-side {
-                max-width: 275px;
+            .about-card,
+            .about-copy {
+                padding: 23px;
             }
 
-            .intro-title {
-                font-size: clamp(2.5rem, 12vw, 4rem);
+            .skills-grid {
+                gap: 9px;
             }
 
-            .intro-description {
-                font-size: 0.94rem;
+            .skill-card {
+                min-height: 82px;
+                padding: 14px;
+                gap: 9px;
             }
 
-            .scrapbook-content {
+            .timeline-item {
                 grid-template-columns: 1fr;
-                gap: 40px;
-                padding: 55px 7% 65px;
+                gap: 10px;
+                padding: 22px;
             }
 
-            .education-paper,
-            .experience-paper {
-                transform: none;
+            .project-card {
+                min-height: 195px;
+                padding: 23px;
             }
 
-            .paper {
-                padding: 30px 24px;
+            .contact-panel {
+                padding: 25px 21px;
             }
 
-            .software-grid {
-                gap: 12px;
-            }
-
-            .software-name {
-                font-size: 0.66rem;
+            .contact-panel h2 {
+                letter-spacing: -1.5px;
             }
         }
 
-<<<<<<< HEAD
-        @media (prefers-reduced-motion: no-preference) {
-            .navigation a,
-            .portfolio-link,
-            .social-link {
-                transition: color 0.2s ease;
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                transition: none !important;
             }
         }
-=======
->>>>>>> d29c88f (Update portfolio scrapbook design)
     </style>
 </head>
 
 <body>
-<div class="scrapbook">
+    @php
+        $imageUrl = $portfolio->profile_picture
+            ? (\Illuminate\Support\Str::startsWith($portfolio->profile_picture, ['http://', 'https://'])
+                ? $portfolio->profile_picture
+                : asset('storage/' . $portfolio->profile_picture))
+            : null;
 
-    <header class="topbar">
-        <a class="brand" href="#home" style="text-decoration: none;">
-            {{ $name }}
-        </a>
+        $skills = $portfolio->skills
+            ? preg_split('/[\r\n,;]+/', $portfolio->skills, -1, PREG_SPLIT_NO_EMPTY)
+            : [];
 
-        <nav class="navigation" aria-label="Main navigation">
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#education">Education</a>
-            <a href="#experience">Experience</a>
-            <a href="#projects">Projects</a>
-        </nav>
+        $initials = collect(preg_split('/\s+/', trim($portfolio->full_name)))
+            ->filter()
+            ->take(2)
+            ->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))
+            ->implode('');
+
+        $websiteUrl = $portfolio->website
+            ? (\Illuminate\Support\Str::startsWith($portfolio->website, ['http://', 'https://'])
+                ? $portfolio->website
+                : 'https://' . $portfolio->website)
+            : null;
+
+        $linkedinUrl = $portfolio->linkedin
+            ? (\Illuminate\Support\Str::startsWith($portfolio->linkedin, ['http://', 'https://'])
+                ? $portfolio->linkedin
+                : 'https://' . $portfolio->linkedin)
+            : null;
+
+        $githubUrl = $portfolio->github
+            ? (\Illuminate\Support\Str::startsWith($portfolio->github, ['http://', 'https://'])
+                ? $portfolio->github
+                : 'https://' . $portfolio->github)
+            : null;
+
+        $socialLinks = $portfolio->social_links
+            ? preg_split('/[\r\n]+/', $portfolio->social_links, -1, PREG_SPLIT_NO_EMPTY)
+            : [];
+
+        $projectItems = $portfolio->projects
+            ? preg_split('/\n\s*\n/', trim($portfolio->projects), -1, PREG_SPLIT_NO_EMPTY)
+            : [];
+
+        $educationItems = $portfolio->educational_background
+            ? preg_split('/\n\s*\n/', trim($portfolio->educational_background), -1, PREG_SPLIT_NO_EMPTY)
+            : [];
+
+        $experienceItems = $portfolio->work_experience
+            ? preg_split('/\n\s*\n/', trim($portfolio->work_experience), -1, PREG_SPLIT_NO_EMPTY)
+            : [];
+    @endphp
+
+    <header class="header" id="top">
+        <div class="container nav">
+            <a class="brand" href="#top">
+                {{ $portfolio->full_name }}<span>.</span>
+            </a>
+
+            <nav class="nav-links mono" aria-label="Main navigation">
+                <a href="#about">About</a>
+                <a href="#skills">Skills</a>
+                <a href="#work">Work</a>
+                <a href="#contact" class="nav-button">Contact ↗</a>
+            </nav>
+        </div>
     </header>
 
     <main>
-        <section class="hero" id="home">
+        <section class="container hero">
+            <div class="hero-copy">
+                <p class="eyebrow mono">Personal Portfolio</p>
 
-            <div class="profile-side">
-                <div class="polaroid">
-                    <div class="portrait">
-                        @if ($profileImage)
-                            <img
-                                src="{{ $profileImage }}"
-                                alt="Portrait of {{ $name }}"
-                            >
-                        @else
-                            <span>{{ $initial }}</span>
+                <h1>
+                    {{ $portfolio->full_name }}
+                    <span>Portfolio.</span>
+                </h1>
+
+                <p class="hero-description">{{ $portfolio->about_me ?: 'Welcome to my portfolio. Explore my background, skills, and work.' }}</p>
+
+                <div class="hero-actions">
+                    <a href="#work" class="button button-primary">Explore my work ↗</a>
+                    <a href="#contact" class="button button-secondary">Get in touch</a>
+                </div>
+            </div>
+
+            <div class="hero-image-wrap">
+                <div class="hero-image">
+                    @if ($imageUrl)
+                        <img src="{{ $imageUrl }}" alt="Portrait of {{ $portfolio->full_name }}">
+                    @else
+                        <div class="image-placeholder">
+                            {{ $initials ?: 'ME' }}
+                        </div>
+                    @endif
+                </div>
+
+                <div class="image-label">
+                    <p class="mono">Portfolio / 01</p>
+                    <p>{{ $portfolio->full_name }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="container section" id="about">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow mono">Introduction</p>
+                    <h2>A little about me.</h2>
+                </div>
+                <span class="section-number mono">01 / ABOUT</span>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card">
+                    <p class="mono">Behind the portfolio</p>
+                    <span class="number">01.</span>
+                    <p>My background, interests, and journey.</p>
+                </div>
+
+                <div class="about-copy">
+                    {{ $portfolio->about_me ?: 'My personal introduction will appear here.' }}
+                </div>
+            </div>
+        </section>
+
+        @if (!empty($skills))
+            <section class="container section" id="skills">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow mono">What I bring</p>
+                        <h2>Skills &amp; strengths.</h2>
+                    </div>
+                    <span class="section-number mono">02 / SKILLS</span>
+                </div>
+
+                <div class="skills-grid">
+                    @foreach ($skills as $index => $skill)
+                        <article class="skill-card">
+                            <span class="skill-index">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                            <p>{{ trim($skill) }}</p>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if (!empty($educationItems))
+            <section class="container section" id="education">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow mono">Academic background</p>
+                        <h2>Education.</h2>
+                    </div>
+                    <span class="section-number mono">03 / EDUCATION</span>
+                </div>
+
+                <div class="timeline">
+                    @foreach ($educationItems as $index => $education)
+                        <article class="timeline-item">
+                            <div class="timeline-label mono">
+                                ENTRY / {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                            </div>
+
+                            <div class="timeline-content">
+                                <h3>{{ trim($education) }}</h3>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if (!empty($experienceItems))
+            <section class="container section" id="experience">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow mono">Professional background</p>
+                        <h2>Experience.</h2>
+                    </div>
+                    <span class="section-number mono">04 / EXPERIENCE</span>
+                </div>
+
+                <div class="timeline">
+                    @foreach ($experienceItems as $index => $experience)
+                        <article class="timeline-item">
+                            <div class="timeline-label mono">
+                                EXPERIENCE / {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                            </div>
+
+                            <div class="timeline-content">
+                                <h3>{{ trim($experience) }}</h3>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if (!empty($projectItems))
+            <section class="container section" id="work">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow mono">Selected work</p>
+                        <h2>Projects &amp; creations.</h2>
+                    </div>
+                    <span class="section-number mono">05 / PROJECTS</span>
+                </div>
+
+                <div class="projects-grid">
+                    @foreach ($projectItems as $index => $project)
+                        <article class="project-card">
+                            <span class="project-index mono">
+                                PROJECT / {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                            </span>
+                            <h3>{{ trim($project) }}</h3>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if ($portfolio->additional_info)
+            <section class="container section" id="additional">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow mono">More details</p>
+                        <h2>Additional information.</h2>
+                    </div>
+                    <span class="section-number mono">06 / DETAILS</span>
+                </div>
+
+                <div class="additional-card">
+                    {{ $portfolio->additional_info }}
+                </div>
+            </section>
+        @endif
+
+        <section class="contact-section" id="contact">
+            <div class="container">
+                <div class="contact-panel">
+                    <p class="eyebrow mono">Let's connect</p>
+
+                    <h2>
+                        Have something
+                        <span>in mind?</span>
+                    </h2>
+
+                    <p class="contact-description">
+                        Thank you for visiting my portfolio.
+                        Feel free to reach out using the contact details below.
+                    </p>
+
+                    <div class="contact-links">
+                        @if ($portfolio->email)
+                            <a class="button button-primary" href="mailto:{{ $portfolio->email }}">
+                                Email me ↗
+                            </a>
+                        @endif
+
+                        @if ($websiteUrl)
+                            <a class="button button-secondary" href="{{ $websiteUrl }}" target="_blank" rel="noopener noreferrer">
+                                Website ↗
+                            </a>
+                        @endif
+
+                        @if ($linkedinUrl)
+                            <a class="button button-secondary" href="{{ $linkedinUrl }}" target="_blank" rel="noopener noreferrer">
+                                LinkedIn ↗
+                            </a>
+                        @endif
+
+                        @if ($githubUrl)
+                            <a class="button button-secondary" href="{{ $githubUrl }}" target="_blank" rel="noopener noreferrer">
+                                GitHub ↗
+                            </a>
                         @endif
                     </div>
 
-                    <div class="polaroid-caption">
-                        a little piece of me
-                    </div>
-                </div>
-
-                <div class="contact-card">
-                    <h2>Contact</h2>
-
-                    @if (!empty($portfolio->email))
-                        <p>
-                            <span class="contact-label">Email</span><br>
-                            <a href="mailto:{{ $portfolio->email }}">
-                                {{ $portfolio->email }}
-                            </a>
-                        </p>
-                    @endif
-
-                    @if (!empty($portfolio->contact_number))
-                        <p>
-                            <span class="contact-label">Phone</span><br>
-                            <a href="tel:{{ $portfolio->contact_number }}">
-                                {{ $portfolio->contact_number }}
-                            </a>
-                        </p>
-                    @endif
-
-                    @if (!empty($portfolio->address))
-                        <p>
-                            <span class="contact-label">Location</span><br>
-                            {{ $portfolio->address }}
-                        </p>
-                    @endif
-
-                    @if (!empty($portfolio->website))
-                        <a
-                            class="portfolio-link"
-                            href="{{ $portfolio->website }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            ↗ Visit my website
-                        </a>
-                    @endif
-                </div>
-            </div>
-
-            <div class="intro-copy" id="about">
-                <p class="eyebrow">A little introduction</p>
-
-                <h1 class="intro-title">
-                    Hi, I'm <span>{{ $name }}</span>
-                </h1>
-
-<<<<<<< HEAD
-                @if (!empty($portfolio->additional_info))
-                    <p class="eyebrow">
-                        {{ $portfolio->additional_info }}
-                    </p>
-                @endif
-=======
-                <p class="profile-title">
-                    {{ $portfolio->additional_info ?? 'Student • Developer • Designer' }}
-                </p>
->>>>>>> d29c88f (Update portfolio scrapbook design)
-
-                <div class="intro-description">{{ $about ?: 'Welcome to my little corner of the internet. Explore my background, skills, and work below.' }}</div>
-
-                <div class="intro-details">
-                    @if (!empty($portfolio->email))
-                        <span class="detail-tag">Creative mind</span>
-                    @endif
-
-                    @if (!empty($portfolio->website))
-                        <span class="detail-tag">Portfolio & work</span>
-                    @endif
-
-                    @if (!empty($portfolio->address))
-                        <span class="detail-tag">
-                            {{ $portfolio->address }}
-                        </span>
-                    @endif
-                </div>
-            </div>
-
-        </section>
-
-        <section class="scrapbook-content">
-
-            <!-- LEFT: EDUCATION AND SKILLS -->
-
-            <article class="paper education-paper" id="education">
-
-                <h2 class="ribbon">Education</h2>
-
-                @if (!empty($education))
-                    <div class="paper-text">{{ $education }}</div>
-                @else
-                    <p class="paper-text">
-                        Add your educational background to display it here.
-                    </p>
-                @endif
-
-                <h3 class="section-heading">Things I can do</h3>
-
-                @if (count($skills))
-                    <div class="skill-list">
-                        @foreach ($skills as $skill)
-                            @if ($skill !== '')
-                                <span class="skill-tag">
-                                    {{ $skill }}
-                                </span>
-                            @endif
-                        @endforeach
-                    </div>
-                @else
-                    <p class="paper-text">
-                        Your skills will appear here once added.
-                    </p>
-                @endif
-
-                <h2 class="ribbon brown">Software & Tools</h2>
-
-                <p class="paper-text">
-                    A few creative tools for bringing ideas to life.
-                </p>
-
-                <div class="software-grid">
-                    <div class="software-item">
-                        <div class="software-icon photoshop">Ps</div>
-                        <span class="software-name">Photoshop</span>
-                    </div>
-
-                    <div class="software-item">
-                        <div class="software-icon illustrator">Ai</div>
-                        <span class="software-name">Illustrator</span>
-                    </div>
-
-                    <div class="software-item">
-                        <div class="software-icon aftereffects">Ae</div>
-                        <span class="software-name">After Effects</span>
-                    </div>
-
-                    <div class="software-item">
-                        <div class="software-icon premiere">Pr</div>
-                        <span class="software-name">Premiere Pro</span>
-                    </div>
-                </div>
-
-                @if (!empty($portfolio->additional_info))
-                    <div class="extra-section">
-                        <h3 class="section-heading">A little more</h3>
-                        <div class="text-block">{{ $portfolio->additional_info }}</div>
-                    </div>
-                @endif
-
-            </article>
-
-            <!-- RIGHT: EXPERIENCE AND PROJECTS -->
-
-            <article class="paper experience-paper" id="experience">
-
-                <h2 class="ribbon green">Experience</h2>
-
-                @if (!empty($experience))
-                    <div class="timeline">
-                        <div class="timeline-entry">
-                            <h3 class="entry-title">
-                                Professional Experience
-                            </h3>
-
-                            <div class="entry-description">{{ $experience }}</div>
-                        </div>
-                    </div>
-                @else
-                    <p class="paper-text">
-                        Your work experience will be displayed here.
-                    </p>
-                @endif
-
-                <section class="extra-section" id="projects">
-                    <h2 class="ribbon">Selected Projects</h2>
-
-                    @if (!empty($projects))
-                        <div class="text-block">{{ $projects }}</div>
-                    @else
-                        <p class="paper-text">
-                            Your projects and creative work will appear here.
-                        </p>
-                    @endif
-                </section>
-
-                @if (!empty($portfolio->social_links) ||
-                     !empty($portfolio->website) ||
-                     !empty($portfolio->linkedin) ||
-                     !empty($portfolio->github))
-
-                    <section class="extra-section">
-                        <h3 class="section-heading">Find me elsewhere</h3>
-
+                    @if ($portfolio->address)
                         <div class="social-links">
-                            @if (!empty($portfolio->website))
-                                <a
-                                    class="social-link"
-                                    href="{{ $portfolio->website }}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    Website ↗
-                                </a>
-                            @endif
-
-                            @if (!empty($portfolio->linkedin))
-                                <a
-                                    class="social-link"
-                                    href="{{ $portfolio->linkedin }}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    LinkedIn ↗
-                                </a>
-                            @endif
-
-                            @if (!empty($portfolio->github))
-                                <a
-                                    class="social-link"
-                                    href="{{ $portfolio->github }}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    GitHub ↗
-                                </a>
-                            @endif
-
-                            @if (!empty($portfolio->social_links))
-                                <div class="paper-text">
-                                    {{ $portfolio->social_links }}
-                                </div>
-                            @endif
+                            <span class="social-label">Location: {{ $portfolio->address }}</span>
                         </div>
-                    </section>
-                @endif
+                    @endif
 
-            </article>
-
+                    @if (!empty($socialLinks))
+                        <div class="social-links">
+                            @foreach ($socialLinks as $socialLink)
+                                <span class="social-label">{{ trim($socialLink) }}</span>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
         </section>
     </main>
 
     <footer class="footer">
-        Made with care by <span>{{ $name }}</span>
+        <div class="container footer-inner">
+            <p>© {{ date('Y') }} {{ $portfolio->full_name }}. All rights reserved.</p>
+            <a href="#top" class="mono">Back to top ↑</a>
+            <a href="{{ route('home') }}" class="mono">Create your portfolio</a>
+        </div>
     </footer>
-
-</div>
 </body>
 </html>
