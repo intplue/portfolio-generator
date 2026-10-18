@@ -9,16 +9,25 @@ use Illuminate\Support\Str;
 
 class PortfolioController extends Controller
 {
+    /**
+     * Display the home page.
+     */
     public function home()
     {
         return view('portfolio.home');
     }
 
+    /**
+     * Display the portfolio creation form.
+     */
     public function create()
     {
         return view('portfolio.create');
     }
 
+    /**
+     * Save a new portfolio.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -54,12 +63,9 @@ class PortfolioController extends Controller
             ->with('success', 'Portfolio information saved successfully.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Template Selection
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Display the template selection page.
+     */
     public function templates($id)
     {
         $portfolio = Portfolio::findOrFail($id);
@@ -67,6 +73,9 @@ class PortfolioController extends Controller
         return view('portfolio.templates', compact('portfolio'));
     }
 
+    /**
+     * Select the Simple template.
+     */
     public function simple($id)
     {
         $portfolio = Portfolio::findOrFail($id);
@@ -75,10 +84,12 @@ class PortfolioController extends Controller
             'template' => 'simple',
         ]);
 
-        return redirect()
-            ->route('portfolio.customize', $portfolio->id);
+        return redirect()->route('portfolio.customize', $portfolio->id);
     }
 
+    /**
+     * Select the Modern template.
+     */
     public function modern($id)
     {
         $portfolio = Portfolio::findOrFail($id);
@@ -87,10 +98,12 @@ class PortfolioController extends Controller
             'template' => 'modern',
         ]);
 
-        return redirect()
-            ->route('portfolio.customize', $portfolio->id);
+        return redirect()->route('portfolio.customize', $portfolio->id);
     }
 
+    /**
+     * Select the Creative template.
+     */
     public function creative($id)
     {
         $portfolio = Portfolio::findOrFail($id);
@@ -99,16 +112,12 @@ class PortfolioController extends Controller
             'template' => 'creative',
         ]);
 
-        return redirect()
-            ->route('portfolio.customize', $portfolio->id);
+        return redirect()->route('portfolio.customize', $portfolio->id);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Customize Template
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Display the customization page.
+     */
     public function customize($id)
     {
         $portfolio = Portfolio::findOrFail($id);
@@ -116,81 +125,81 @@ class PortfolioController extends Controller
         return view('portfolio.customize', compact('portfolio'));
     }
 
+    /**
+     * Validate and save template customization.
+     */
     public function saveCustomization(Request $request, $id)
     {
         $portfolio = Portfolio::findOrFail($id);
 
         $validated = $request->validate([
-            'accent_color' => 'required|string|max:255',
-            'layout_style' => 'required|string|max:255',
+            'accent_color' => [
+                'required',
+                'in:green,blue,plum,custom',
+            ],
+            'custom_color' => [
+                'nullable',
+                'required_if:accent_color,custom',
+                'regex:/^#[0-9A-Fa-f]{6}$/',
+            ],
+            'layout_style' => [
+                'required',
+                'in:standard,cards,editorial',
+            ],
         ]);
 
-        $portfolio->update($validated);
+        $presetColors = [
+            'green' => '#526b5d',
+            'blue' => '#3d6fa8',
+            'plum' => '#432a46',
+        ];
+
+        if ($validated['accent_color'] === 'custom') {
+            $accentColor = strtolower($validated['custom_color']);
+        } else {
+            $accentColor = $presetColors[$validated['accent_color']];
+        }
+
+        $portfolio->update([
+            'accent_color' => $accentColor,
+            'layout_style' => $validated['layout_style'],
+        ]);
 
         return redirect()
             ->route('portfolio.preview', $portfolio->id)
             ->with('success', 'Template customization saved successfully.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Portfolio Preview
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Display the selected portfolio template.
+     */
     public function preview($id)
     {
         $portfolio = Portfolio::findOrFail($id);
 
-        return match ($portfolio->template) {
-            'modern' => view(
-                'portfolio.modern',
-                compact('portfolio')
-            ),
+        $view = $this->getTemplateView($portfolio);
 
-            'creative' => view(
-                'portfolio.creative',
-                compact('portfolio')
-            ),
-
-            default => view(
-                'portfolio.simple',
-                compact('portfolio')
-            ),
-        };
+        return view($view, compact('portfolio'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Portfolio Management
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Display all saved portfolios.
+     */
     public function manage()
     {
         $portfolios = Portfolio::latest()->get();
 
-        return view(
-            'portfolio.manage',
-            compact('portfolios')
-        );
+        return view('portfolio.manage', compact('portfolios'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Download Portfolio
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Download the generated portfolio as an HTML file.
+     */
     public function download($id)
     {
         $portfolio = Portfolio::findOrFail($id);
 
-        $view = match ($portfolio->template) {
-            'modern' => 'portfolio.modern',
-            'creative' => 'portfolio.creative',
-            default => 'portfolio.simple',
-        };
+        $view = $this->getTemplateView($portfolio);
 
         $html = view($view, compact('portfolio'))->render();
 
@@ -209,28 +218,19 @@ class PortfolioController extends Controller
         );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Edit Portfolio
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Display the edit form.
+     */
     public function edit($id)
     {
         $portfolio = Portfolio::findOrFail($id);
 
-        return view(
-            'portfolio.edit',
-            compact('portfolio')
-        );
+        return view('portfolio.edit', compact('portfolio'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update Portfolio
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Update existing portfolio information.
+     */
     public function update(Request $request, $id)
     {
         $portfolio = Portfolio::findOrFail($id);
@@ -256,13 +256,9 @@ class PortfolioController extends Controller
         if ($request->hasFile('profile_picture')) {
             if (
                 $portfolio->profile_picture &&
-                Storage::disk('public')->exists(
-                    $portfolio->profile_picture
-                )
+                Storage::disk('public')->exists($portfolio->profile_picture)
             ) {
-                Storage::disk('public')->delete(
-                    $portfolio->profile_picture
-                );
+                Storage::disk('public')->delete($portfolio->profile_picture);
             }
 
             $validated['profile_picture'] = $request
@@ -277,25 +273,18 @@ class PortfolioController extends Controller
             ->with('success', 'Portfolio updated successfully.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Delete Portfolio
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Delete a portfolio and its stored profile picture.
+     */
     public function destroy($id)
     {
         $portfolio = Portfolio::findOrFail($id);
 
         if (
             $portfolio->profile_picture &&
-            Storage::disk('public')->exists(
-                $portfolio->profile_picture
-            )
+            Storage::disk('public')->exists($portfolio->profile_picture)
         ) {
-            Storage::disk('public')->delete(
-                $portfolio->profile_picture
-            );
+            Storage::disk('public')->delete($portfolio->profile_picture);
         }
 
         $portfolio->delete();
@@ -303,5 +292,17 @@ class PortfolioController extends Controller
         return redirect()
             ->route('portfolio.manage')
             ->with('success', 'Portfolio deleted successfully.');
+    }
+
+    /**
+     * Return the Blade view for the selected template.
+     */
+    private function getTemplateView(Portfolio $portfolio): string
+    {
+        return match ($portfolio->template) {
+            'modern' => 'portfolio.modern',
+            'creative' => 'portfolio.creative',
+            default => 'portfolio.simple',
+        };
     }
 }
