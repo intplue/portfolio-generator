@@ -52,13 +52,13 @@
 
         
 
-/* Preview navigation buttons */
+
 .preview-navigation {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
+    justify-content: flex-end;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
     max-width: 1120px;
     margin: 20px auto;
     padding: 0 24px;
@@ -69,43 +69,49 @@
     align-items: center;
     justify-content: center;
     gap: 9px;
-    min-height: 44px;
-    padding: 11px 18px;
-    border: 1px solid var(--accent, var(--burgundy, #526b5d));
-    border-radius: 10px;
-    background: var(--accent, var(--burgundy, #526b5d));
-    color: #fff;
+    min-height: 42px;
+    padding: 10px 16px;
+    border: 1px solid #d7dce3;
+    border-radius: 6px;
+    background: transparent;
+    color: #e7edf5;
     font-family: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.4;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .2px;
     text-decoration: none;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-    transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+    transition: background .2s ease,
+                color .2s ease,
+                border-color .2s ease;
+}
+
+.preview-navigation a:last-child {
+    background: var(--accent, var(--burgundy, #504458));
+    border-color: var(--accent, var(--burgundy, #504458));
+    color: #fff;
 }
 
 .preview-navigation a:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-    opacity: .9;
+    background: rgba(127, 127, 127, .12);
+    border-color: var(--accent, var(--burgundy, #504458));
+    color: var(--accent, var(--burgundy, #504458));
 }
 
-.preview-navigation a:focus-visible {
-    outline: 3px solid var(--accent, var(--burgundy, #526b5d));
-    outline-offset: 3px;
+.preview-navigation a:last-child:hover {
+    opacity: .88;
+    color: #fff;
 }
 
 @media (max-width: 600px) {
     .preview-navigation {
-        justify-content: stretch;
         padding: 0 16px;
-        gap: 10px;
+        gap: 8px;
     }
 
     .preview-navigation a {
         flex: 1;
-        padding: 11px 12px;
-        font-size: 12px;
+        padding: 10px;
+        font-size: 11px;
     }
 }
 
@@ -114,6 +120,7 @@
         display: none !important;
     }
 }
+
 
 
 
