@@ -355,25 +355,34 @@
 </head>
 
 <body>
-    @php
-        $savedAccent = old('accent_color', $portfolio->accent_color ?? 'green');
+    
+@php
+    $presets = [
+        'green' => '#526b5d',
+        'blue' => '#3d6fa8',
+        'plum' => '#432a46',
+    ];
 
-        $presets = [
-            'green' => '#526b5d',
-            'blue' => '#3d6fa8',
-            'plum' => '#432a46',
-        ];
+    $savedAccent = old('accent_color', $portfolio->accent_color ?? 'green');
+    $savedLayout = old('layout_style', $portfolio->layout_style ?? 'standard');
 
-        $isCustomColor = is_string($savedAccent)
-            && preg_match('/^#[0-9a-fA-F]{6}$/', $savedAccent) === 1;
+    $savedAccent = strtolower($savedAccent);
 
-        $customColor = $isCustomColor
-            ? $savedAccent
-            : old('custom_color', '#8b1e3f');
+    $matchedPreset = array_search($savedAccent, $presets, true);
 
-        $selectedAccent = $isCustomColor ? 'custom' : $savedAccent;
-        $selectedLayout = old('layout_style', $portfolio->layout_style ?? 'standard');
-    @endphp
+    if ($matchedPreset !== false) {
+        $selectedAccent = $matchedPreset;
+        $customColor = old('custom_color', '#8b1e3f');
+    } elseif (preg_match('/^#[0-9a-f]{6}$/i', $savedAccent)) {
+        $selectedAccent = 'custom';
+        $customColor = $savedAccent;
+    } else {
+        $selectedAccent = $savedAccent;
+        $customColor = old('custom_color', '#8b1e3f');
+    }
+
+    $selectedLayout = $savedLayout;
+     @endphp
 
     <nav class="navbar">
         <div class="logo">Portfolio Generator</div>

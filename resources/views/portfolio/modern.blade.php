@@ -12,17 +12,19 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-       :root {
-          --bg: #090e17;
-         --surface: #101927;
-         --surface-light: #152338;
-         --border: rgba(177, 201, 230, 0.14);
-         --text: #edf3fb;
-         --muted: #9baabe;
-         --accent: {{ $portfolio->accent_color ?: '#91b9e8' }};
-         --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
-         --radius: 16px;
-        }
+       
+:root {
+    --bg: color-mix(in srgb, {{ $portfolio->accent_color ?: '#91b9e8' }} 35%, #090e17);
+    --surface: #101927;
+    --surface-light: #152338;
+    --border: rgba(177, 201, 230, 0.14);
+    --text: #edf3fb;
+    --muted: #9baabe;
+    --accent: {{ $portfolio->accent_color ?: '#91b9e8' }};
+    --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+    --radius: 16px;
+}
+
 
         * {
             box-sizing: border-box;
@@ -47,6 +49,42 @@
             color: inherit;
             text-decoration: none;
         }
+
+        
+.preview-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 5%;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.preview-navigation a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    background: var(--accent);
+    color: #090e17;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.preview-navigation a:hover {
+    opacity: .85;
+}
+
+@media print {
+    .preview-navigation {
+        display: none;
+    }
+}
+
 
         img {
             display: block;
@@ -666,16 +704,16 @@
 
 <body>
       @if (!empty($showNavigation))
-        <div class="preview-navigation">
-            <a href="{{ route('portfolio.customize', $portfolio->id) }}">
-                &larr; Back to Customize
-            </a>
-            <a href="{{ route('portfolio.templates', $portfolio->id) }}">
-                All Templates
-            </a>
-        </div>
-    @endif
-    
+    <nav class="preview-navigation">
+        <a href="{{ route('portfolio.customize', $portfolio->id) }}">
+            <span aria-hidden="true">←</span> Back to Customize
+        </a>
+        <a href="{{ route('portfolio.templates', $portfolio->id) }}">
+            <span aria-hidden="true">▦</span> All Templates
+        </a>
+    </nav>
+@endif
+
     @php
         $imageUrl = $portfolio->profile_picture
             ? (\Illuminate\Support\Str::startsWith($portfolio->profile_picture, ['http://', 'https://'])

@@ -11,23 +11,29 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @php
-        $accent = match ($portfolio->accent_color) {
-            'blue' => '#6279e8',
-            'plum' => '#9863b7',
-            default => '#a46bd1',
-        };
+   
+$accent = match ($portfolio->accent_color) {
+    'green' => '#526b5d',
+    'blue' => '#3d6fa8',
+    'plum' => '#432a46',
+    default => preg_match('/^#[0-9a-fA-F]{6}$/', (string) $portfolio->accent_color)
+        ? $portfolio->accent_color
+        : '#a46bd1',
+};
 
-        $accentLight = match ($portfolio->accent_color) {
-            'blue' => '#e1e8ff',
-            'plum' => '#f0e1fa',
-            default => '#eee1ff',
-        };
+$accentLight = match ($portfolio->accent_color) {
+    'green' => '#e0e9e2',
+    'blue' => '#e1e8ff',
+    'plum' => '#f0e1fa',
+    default => '#eee1ff',
+};
 
-        $accentMuted = match ($portfolio->accent_color) {
-            'blue' => '#5265c4',
-            'plum' => '#81509f',
-            default => '#8752b2',
-        };
+$accentMuted = match ($portfolio->accent_color) {
+    'green' => '#405849',
+    'blue' => '#5265c4',
+    'plum' => '#81509f',
+    default => '#8752b2',
+};
 
         $layout = $portfolio->layout_style ?? 'standard';
 
@@ -84,6 +90,38 @@
         a {
             color: inherit;
         }
+        
+        
+.preview-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    max-width: 1120px;
+    margin: 0 auto 16px;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: white;
+}
+
+.preview-navigation a {
+    color: var(--accent-muted);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.preview-navigation a:hover {
+    text-decoration: underline;
+}
+
+@media print {
+    .preview-navigation {
+        display: none;
+    }
+}
+ 
 
         .portfolio {
             position: relative;
@@ -686,6 +724,16 @@
 </head>
 
 <body>
+      @if (!empty($showNavigation))
+        <nav class="preview-navigation">
+            <a href="{{ route('portfolio.customize', $portfolio->id) }}">
+                &larr; Back to Customize
+            </a>
+            <a href="{{ route('portfolio.templates', $portfolio->id) }}">
+                All Templates
+            </a>
+        </nav>
+    @endif
     <main class="portfolio layout-{{ $layout }}">
 
         <span class="sparkle sparkle-one" aria-hidden="true">✳</span>
