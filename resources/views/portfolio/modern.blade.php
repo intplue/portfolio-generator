@@ -51,39 +51,70 @@
         }
 
         
+
+/* Preview navigation buttons */
 .preview-navigation {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
+    flex-wrap: wrap;
     gap: 12px;
-    padding: 16px 5%;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    max-width: 1120px;
+    margin: 20px auto;
+    padding: 0 24px;
 }
 
 .preview-navigation a {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 15px;
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    background: var(--accent);
-    color: #090e17;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 11px 18px;
+    border: 1px solid var(--accent, var(--burgundy, #526b5d));
+    border-radius: 10px;
+    background: var(--accent, var(--burgundy, #526b5d));
+    color: #fff;
+    font-family: inherit;
     font-size: 13px;
     font-weight: 700;
+    line-height: 1.4;
     text-decoration: none;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
 }
 
 .preview-navigation a:hover {
-    opacity: .85;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    opacity: .9;
+}
+
+.preview-navigation a:focus-visible {
+    outline: 3px solid var(--accent, var(--burgundy, #526b5d));
+    outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+    .preview-navigation {
+        justify-content: stretch;
+        padding: 0 16px;
+        gap: 10px;
+    }
+
+    .preview-navigation a {
+        flex: 1;
+        padding: 11px 12px;
+        font-size: 12px;
+    }
 }
 
 @media print {
     .preview-navigation {
-        display: none;
+        display: none !important;
     }
 }
+
 
 
         img {
@@ -703,16 +734,21 @@
 </head>
 
 <body>
-      @if (!empty($showNavigation))
-    <nav class="preview-navigation">
+     
+@if (!empty($showNavigation))
+    <nav class="preview-navigation" aria-label="Preview navigation">
         <a href="{{ route('portfolio.customize', $portfolio->id) }}">
-            <span aria-hidden="true">←</span> Back to Customize
+            <span aria-hidden="true">←</span>
+           Back
         </a>
+
         <a href="{{ route('portfolio.templates', $portfolio->id) }}">
-            <span aria-hidden="true">▦</span> All Templates
+            <span aria-hidden="true">▦</span>
+            All Templates
         </a>
     </nav>
 @endif
+
 
     @php
         $imageUrl = $portfolio->profile_picture
