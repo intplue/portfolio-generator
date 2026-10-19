@@ -180,7 +180,7 @@ class PortfolioController extends Controller
 
         $view = $this->getTemplateView($portfolio);
 
-        return view($view, compact('portfolio'));
+        return view($view, compact('portfolio'))->with('showNavigation', true);
     }
 
     /**

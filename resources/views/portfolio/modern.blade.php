@@ -12,16 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --bg: #090e17;
-            --surface: #101927;
-            --surface-light: #152338;
-            --border: rgba(177, 201, 230, 0.14);
-            --text: #edf3fb;
-            --muted: #9baabe;
-            --accent: #91b9e8;
-            --accent-soft: rgba(145, 185, 232, 0.1);
-            --radius: 16px;
+       :root {
+          --bg: #090e17;
+         --surface: #101927;
+         --surface-light: #152338;
+         --border: rgba(177, 201, 230, 0.14);
+         --text: #edf3fb;
+         --muted: #9baabe;
+         --accent: {{ $portfolio->accent_color ?: '#91b9e8' }};
+         --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+         --radius: 16px;
         }
 
         * {
@@ -665,6 +665,17 @@
 </head>
 
 <body>
+      @if (!empty($showNavigation))
+        <div class="preview-navigation">
+            <a href="{{ route('portfolio.customize', $portfolio->id) }}">
+                &larr; Back to Customize
+            </a>
+            <a href="{{ route('portfolio.templates', $portfolio->id) }}">
+                All Templates
+            </a>
+        </div>
+    @endif
+    
     @php
         $imageUrl = $portfolio->profile_picture
             ? (\Illuminate\Support\Str::startsWith($portfolio->profile_picture, ['http://', 'https://'])
