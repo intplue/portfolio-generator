@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Portfolio extends Model
 {
     protected $fillable = [
+        'user_id',
         'full_name',
         'email',
         'contact_number',
@@ -25,5 +27,16 @@ class Portfolio extends Model
         'template',
         'accent_color',
         'layout_style',
+        'is_public',
+        'share_token',
     ];
+
+    protected $casts = [
+        'is_public' => 'boolean',
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

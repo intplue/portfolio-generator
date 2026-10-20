@@ -34,6 +34,24 @@
             align-items: center;
         }
 
+        .app-logout {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #18382a;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(24, 56, 42, 0.18);
+        }
+
         .logo {
             color: #18382a;
             font-size: 18px;
@@ -243,6 +261,11 @@
 
 <body>
 
+    <form method="POST" action="{{ route('logout') }}" style="position: fixed; top: 20px; left: 20px; z-index: 1000; margin: 0;">
+        @csrf
+        <button type="submit" class="app-logout">LOG OUT</button>
+    </form>
+
     <nav class="navbar">
         <div class="logo">
             Portfolio Generator
@@ -272,6 +295,9 @@
             </div>
         @endif
 
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:22px; flex-wrap:wrap; padding-top: 24px;">
+            <div style="color:#526b5d; font-size:14px;">Signed in as <strong>{{ auth()->user()->name }}</strong></div>
+        </div>
 
         @if($portfolios->count())
 
@@ -315,7 +341,6 @@
                                     VIEW
                                 </a>
 
-
                                 <a
                                     href="{{ route('portfolio.edit', $portfolio->id) }}"
                                     class="edit-button"
@@ -323,6 +348,20 @@
                                     EDIT
                                 </a>
 
+                                <form method="POST" action="{{ route('portfolio.share', $portfolio->id) }}">
+                                    @csrf
+                                    <input type="hidden" name="is_public" value="{{ $portfolio->is_public ? 0 : 1 }}">
+                                    <button type="submit" class="edit-button" style="background:#e5e1d4; color:#18382a;">
+                                        {{ $portfolio->is_public ? 'DISABLE SHARE' : 'SHARE PORTFOLIO' }}
+                                    </button>
+                                </form>
+
+                                @if($portfolio->is_public && $portfolio->share_token)
+                                    <div style="width:100%; margin-top:12px;">
+                                        <input type="text" value="{{ url('/shared/' . $portfolio->share_token) }}" readonly style="width:100%; padding:10px 12px; border:1px solid #d5d0c3; border-radius:8px; font-size:12px; background:#fff;">
+                                        <button type="button" onclick="navigator.clipboard.writeText('{{ url('/shared/' . $portfolio->share_token) }}'); this.textContent='COPIED';" style="margin-top:8px;background:#18382a;color:#fff;border:none;border-radius:8px;padding:9px 12px;font-family:'Raleway',sans-serif;font-weight:700;cursor:pointer;">COPY LINK</button>
+                                    </div>
+                                @endif
 
                                 <form
                                     action="{{ route('portfolio.destroy', $portfolio->id) }}"

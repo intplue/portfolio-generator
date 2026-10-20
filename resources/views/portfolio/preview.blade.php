@@ -61,6 +61,24 @@
             color: #526b5d;
         }
 
+        .app-logout {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #18382a;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(24, 56, 42, 0.18);
+        }
+
         .page-header {
             text-align: center;
             padding: 48px 20px 30px;
@@ -350,6 +368,11 @@
 </head>
 
 <body>
+
+    <form method="POST" action="{{ route('logout') }}" style="position: fixed; top: 20px; left: 20px; z-index: 1000; margin: 0;">
+        @csrf
+        <button type="submit" class="app-logout">LOG OUT</button>
+    </form>
 
     <nav>
 
